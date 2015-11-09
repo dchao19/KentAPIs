@@ -1,0 +1,31 @@
+{
+  "name": "KentScheduleServer",
+  "version": "0.0.1",
+  "description": "An API for the Kent Schedule Server widget that uses JavaScript instead of Java. Should work better and be more versatile. ",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://dchao19@github.com/dchao19/KentScheduleServer.git"
+  },
+   "dependencies": {
+        "express": "~4.0.0",
+        "mongoose": "~3.6.13",
+        "body-parser": "~1.0.1"
+    },
+  "keywords": [
+    "kds",
+    "schedules",
+    "api",
+    "Kent",
+    "Denver"
+  ],
+  "author": "Daniel Chao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dchao19/KentScheduleServer/issues"
+  },
+  "homepage": "https://github.com/dchao19/KentScheduleServer"
+}
