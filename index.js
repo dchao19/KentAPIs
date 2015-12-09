@@ -5,7 +5,7 @@
 var express = require('express'); // call express
 var app = express(); // define our app using express
 var bodyParser = require('body-parser');
-var moment = require('moment');
+moment = require('moment');
 today = moment("2015-11-9 9:02 AM", "YYYY-MM-DD hh:mm A"); //global instance of right now in moment
 
 //Set-up database

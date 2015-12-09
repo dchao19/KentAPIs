@@ -16,7 +16,9 @@ router.get('/day_type', function(req, res, next) {
 router.get('/day_type/:date', function(req, res, next) {
     console.log(req.params);
     console.log(req.params.date);
-    DayType.find({date:req.params.date}, function(err, queryResult) {
+    var date = req.params.date;
+    if(date == "now") date = moment();
+    DayType.find({date:date}, function(err, queryResult) {
         if (err) res.status('400').send({
             error: "Invalid query"
         });
@@ -24,4 +26,17 @@ router.get('/day_type/:date', function(req, res, next) {
     });
 });
 
+
+router.post('/period', function(req,res){
+	Period.create({
+		day: new Date(), 
+		start_time: new Date(),
+		end_time: new Date(), 
+		title: req.body.title,
+		linked_day: 1
+	},function(err, post){
+		if(err) res.json("error");
+		res.json(post);
+	});
+});
 module.exports = router;
