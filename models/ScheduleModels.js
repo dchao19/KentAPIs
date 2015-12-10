@@ -5,14 +5,14 @@ var periodSchema = new mongoose.Schema({
     start_time: Date,
     end_time: Date,
     title: String,
-    linked_day: Number
+    linked_day: String
 });
 
 var daySchema = new mongoose.Schema({
     date: Date,
     period_list: Array,
     title: String,
-    linked_day_type: Number
+    linked_day_type: String
 });
 
 var dayTypeSchema = new mongoose.Schema({
