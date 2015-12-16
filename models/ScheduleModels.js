@@ -10,7 +10,8 @@ var periodSchema = new mongoose.Schema({
 
 var daySchema = new mongoose.Schema({
     date: Date,
-    period_list: Array,
+    period_list_pretty: Array,
+    period_list_ids: Array,
     title: String,
     linked_day_type: String
 });

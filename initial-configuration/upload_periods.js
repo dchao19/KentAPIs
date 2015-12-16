@@ -1,28 +1,28 @@
 var ical = require('ical')
 var unirest = require('unirest')
+var moment = require('moment');
 
-
-var all_periods = ical.parseFile('./resources/AllPeriods.ics')
+var all_periods = ical.parseFile('./resources/AllPeriods.ics');
 
 for( var i in all_periods) {
         if(all_periods.hasOwnProperty(i)) {
-                var event = all_periods[i];
-                console.log(event.start);
-                //var req = unirest.post('localhost:8080');
-                var req = unirest.post('http://mockbin.org/bin/f53d2e08-9ab9-41e4-9de3-a8ad97df3aa4');
-                req.multipart([{
-                                'content-type': 'application-json',
-                                'body': JSON.stringify({'__type': 'Date', 
-                                        'iso': event.start.toISOString()
-                                })
-                }]);
-                req.end(function(res) {
-                    if(res.error) console.log(res.error);
-                    console.log(res.body);
-                });
-                break;
+            var event = all_periods[i];
+
+            var date = moment(event.start).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+            var req = unirest.post('http://localhost:8080/schedule/period').type('json').send({
+                'day' : date.toISOString(), //standardized at 7:00 AM (MDT) the day of the period
+                'start_time': event.start.toISOString(), //match db schema
+                'end_time': event.end.toISOString(),
+                'title': event.summary,
+            });
+             
+            req.end(function(res) {
+                if(res.error) console.log(res.error);
+                console.log(res.body);
+            });
         }
 }
+
 
 
 
