@@ -16,18 +16,27 @@ router.get('/day_type', function(req, res, next) {
 });
 
 
-router.get('/day_type/:date', function(req, res, next) {
-    console.log(req.params);
-    console.log(req.params.date);
-    var date = req.params.date;
+router.get('/day_type', function(req, res, next) {
+    var date = req.query.date;
     if(date == "now") date = moment();
-    DayType.find({date:date.toISOString()}, function(err, queryResult) {
+    DayType.find({date:date}, function(err, queryResult) {
         if (err) res.status('400').send({
             error: "Invalid query"
         });
         res.json(queryResult);
     });
 });
+
+router.get('/period', function(req, res) {
+    Period.find({day:req.query.date}, function(error, result) {
+        if(error) res.status('400').send({
+                error: "Invalid query"
+        });
+        res.json(result);
+    });
+
+});
+
 
 router.post('/period', function(req,res){
     DayType.findOne({date:new Date(req.body.day)}, function(error, result){
