@@ -28,7 +28,14 @@ router.get('/day_type', function(req, res, next) {
 });
 
 router.get('/period', function(req, res) {
-    Period.find({day:req.query.date}, function(error, result) {
+    var day = new Date(req.query.date);
+    if(day == "Invalid Date") {
+        res.status('400').send({
+            error: "Invalid date format"
+        });
+    }
+    day.setHours(6);
+    Period.find({day:day.toISOString()}, function(error, result) {
         if(error) res.status('400').send({
                 error: "Invalid query"
         });
