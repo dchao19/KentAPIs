@@ -30,6 +30,14 @@ router2.get('/', function(req,res){
 	res.json({message: "API v2 OK"});
 });
 
+router.get('/day_type', function(req, res) {
+    var day; 
+    getScheduleDay(function(result){
+    	day = result;
+        res.json({daytype: day})
+    });
+});
+        
 router.get('/getScheduleDay', function(req, res) {
     var day;
  
