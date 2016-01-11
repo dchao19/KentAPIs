@@ -27,25 +27,30 @@ passport.deserializeUser(Account.deserializeUser());
  * ****************************/
 
 router.get('/', function(req, res) {
-    res.json('API OK');
+        res.json('API OK');
 });
-
+/*
 router.get('/day_type', function(req, res, next) {
         var today = moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc();
         DayType.findOne({date: today.toDate()}, function(error,results){
                 res.json(results);
         });
 });
-
+*/
 
 router.get('/day_type', function(req, res, next) {
         var date = req.query.date;
-        if(date == "now") date = moment();
-        DayType.find({date:date}, function(err, queryResult) {
+        if(!date || date == "now") date = moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+        console.log(date);
+        DayType.findOne({date: date}, function(err, queryResult) {
                 if (err) res.status('400').send({
                         error: "Invalid query"
                 });
-                res.json(queryResult);
+                if(queryResult){
+                    res.json({date: queryResult.date, type: queryResult.type});
+                } else {
+                    res.json(400, {error:"Invalid date format"});
+                }
         });
 });
 
@@ -67,7 +72,7 @@ router.get('/period', function(req, res) {
 });
 
 router.post('/register', function(req, res) {
-        Account.register(new Account({ username:req.body.username, admin:false}), req.body.password, function(err, account) {
+        Account.register(new Account({ username:req.body.username, userType:"User"}), req.body.password, function(err, account) {
                 if(err) {
                         return res.json({message:'Error creating account', account: account});
                 }
@@ -127,35 +132,45 @@ router.use(function(req, res, next) {
 
 
 router.post('/period', function(req,res){
-        DayType.findOne({date:new Date(req.body.day)}, function(error, result){
-                var poster = {
-                        day: new Date(req.body.day),
-                        start_time: new Date(req.body.start_time),
-                        end_time: new Date(req.body.end_time),
-                        title: req.body.title,
-                        linked_day: result._id
-                };
-                Period.create(poster, function(err, post){
-                        if(err) res.json("error");
-                        res.json(post);
-                });   
-        })
+        var userType = req.decoded.account.userType;
+        if(userType == "Admin") {
+                DayType.findOne({date:new Date(req.body.day)}, function(error, result){
+                        var poster = {
+                                day: new Date(req.body.day),
+                                start_time: new Date(req.body.start_time),
+                                end_time: new Date(req.body.end_time),
+                                title: req.body.title,
+                                linked_day: result._id
+                        };
+                        Period.create(poster, function(err, post){
+                                if(err) res.json("error");
+                                res.json(post);
+                        });   
+                });
+        } else {
+                res.json(401, {"message": "You do not have permission to perform that action"});
+        }                       
 });
 
 router.post('/day_type', function(req,res){
-        var date = moment(req.body.date).hours(6).utcOffset(-6).format();
-        DayType.create({
-                'date': date,
-                'type': req.body.type
-        },
-        function(err,post){
-                if(err) res.json("error");
-                res.json(post);
-        });
+        var userType = req.decoded.account.userType;
+        if(userType == "Admin") {
+                var date = moment(req.body.date).hours(6).utcOffset(-6).format();
+                DayType.create({
+                        'date': date,
+                        'type': req.body.type
+                },
+                function(err,post){
+                        if(err) res.json("error");
+                        res.json(post);
+                });
+        } else {
+                res.json(401, {"message": "You do not have permission to perform that action"});
+        }                       
 });
 
 router.get('/auth-test', function(req, res) {
-    res.json('Authentication successful!');
+        res.json('Authentication successful!');
 });
 
 module.exports = router;
