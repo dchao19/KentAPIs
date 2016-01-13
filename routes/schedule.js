@@ -30,44 +30,91 @@ router.get('/', function(req, res) {
         res.json('API OK');
 });
 /*
-router.get('/day_type', function(req, res, next) {
-        var today = moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-        DayType.findOne({date: today.toDate()}, function(error,results){
-                res.json(results);
-        });
-});
-*/
+   router.get('/day_type', function(req, res, next) {
+   var today = moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+   DayType.findOne({date: today.toDate()}, function(error,results){
+   res.json(results);
+   });
+   });
+   */
 
 router.get('/day_type', function(req, res, next) {
-        var date = req.query.date;
+        var date = new Date(req.query.date);
         if(!date || date == "now") date = moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-        console.log(date);
         DayType.findOne({date: date}, function(err, queryResult) {
                 if (err) res.status('400').send({
                         error: "Invalid query"
                 });
                 if(queryResult){
-                    res.json({date: queryResult.date, type: queryResult.type});
+                        res.json({date: queryResult.date, type: queryResult.type});
                 } else {
-                    res.json(400, {error:"Invalid date format"});
+                        res.json(400, {error:"Invalid date format"});
                 }
         });
 });
 
-router.get('/period', function(req, res) {
-        var day = new Date(req.query.date);
-        if(day == "Invalid Date") {
+router.get('/all_periods', function(req, res) {
+        var date;
+        if(req.query.date == "now") 
+                date = new Date(moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc());
+        else 
+                date = new Date(req.query.date);
+        if(date == "Invalid Date") {
                 res.status('400').send({
                         error: "Invalid date format"
                 });
         }
-        day.setHours(6);
-        Period.find({day:day.toISOString()}, function(error, result) {
+        date.setHours(6);
+        Period.find({day:date.toISOString()}, function(error, result) {
                 if(error) res.status('400').send({
                         error: "Invalid query"
                 });
-                res.json(result);
+                pretty_result = [];
+                for(var i in result) {
+                        period = result[i];
+                        pretty_result.push({
+                                title:period.title, 
+                                start_time:period.start_time, 
+                                end_time:period.end_time,
+                                day:period.day
+                        });
+                }
+                pretty_result.sort(function(a, b) {
+                        return (new Date(a.start_time)).getTime() - (new Date(b.start_time)).getTime();
+                });
+                res.json(200, pretty_result);
         });
+
+});
+
+router.get('/period', function(req, res) {
+        var date;
+        if(req.query.date == "now") 
+                date = new Date();
+        else 
+                date = new Date(req.query.date);
+        if(date == "Invalid Date") {
+                res.status('400').send({
+                        error: "Invalid date format"
+                });
+        }
+        Period.findOne({
+                $and:[
+                {start_time:{$lte:date.toISOString()}}, 
+                {end_time:{$gte:date.toISOString()}}
+                ]}, function(error, result) {
+                        if(error) res.status('400').send({
+                                error: "Invalid query"
+                        });
+                        period = result;
+                        pretty_result = {
+                                title:period.title, 
+                                start_time:period.start_time, 
+                                end_time:period.end_time,
+                                day:period.day
+                        }
+                        res.json(200, pretty_result);
+                });
 
 });
 
@@ -129,7 +176,6 @@ router.use(function(req, res, next) {
 /********************************
  * Authenticated Routes
  * ******************************/
-
 
 router.post('/period', function(req,res){
         var userType = req.decoded.account.userType;
