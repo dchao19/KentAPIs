@@ -39,8 +39,11 @@ router.get('/', function(req, res) {
    */
 
 router.get('/day_type', function(req, res, next) {
-        var date = new Date(req.query.date);
-        if(!date || date == "now") date = moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+        var date;
+        if(req.query.date == "now") 
+                date = new Date(moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc());
+        else 
+                date = new Date(req.query.date);
         DayType.findOne({date: date}, function(err, queryResult) {
                 if (err) res.status('400').send({
                         error: "Invalid query"
