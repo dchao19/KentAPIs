@@ -7,10 +7,11 @@ var app = express(); // define our app using express
 var bodyParser = require('body-parser');
 moment = require('moment');
 today = moment("2015-11-9 9:02 AM", "YYYY-MM-DD hh:mm A"); //global instance of right now in moment
+var config = require('./config.js');
 
 //Set-up database
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/KentScheduleApis', function(err) {
+mongoose.connect(config.database, function(err) {
     if (err) {
         console.log('Database connection error', err);
     } else {
