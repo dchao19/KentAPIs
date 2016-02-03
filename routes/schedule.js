@@ -44,6 +44,8 @@ router.get('/day_type', function(req, res, next) {
                 date = new Date(moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc());
         else 
                 date = new Date(req.query.date);
+        console.log(date);
+        console.log(date.toISOString());
         DayType.findOne({date: date}, function(err, queryResult) {
                 if (err) res.status('400').send({
                         error: "Invalid query"
@@ -68,6 +70,7 @@ router.get('/all_periods', function(req, res) {
                 });
         }
         date.setHours(6);
+        console.log(date.toISOString());
         Period.find({day:date.toISOString()}, function(error, result) {
                 if(error) res.status('400').send({
                         error: "Invalid query"
