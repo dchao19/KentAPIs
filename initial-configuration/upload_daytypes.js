@@ -1,6 +1,7 @@
 var ical = require('ical')
 var unirest = require('unirest')
 var moment = require('moment');
+var timezone = require('moment-timezone')
 var config = require('./config')
 
 var serverAddress = config.serverAddress;
@@ -22,18 +23,20 @@ req.end(function (res) {
         for(var i in day_types){
                 if(day_types.hasOwnProperty(i)){
                         var day = day_types[i];
-                        var date = moment(day.start).hours(6).minutes(0).utc();
+                        var date = moment(day.start).tz('America/Denver').hours(6).minutes(0).utc();
+                        console.log(date.toISOString());
                         req = unirest.post(serverAddress + '/schedule/day_type').type('json').send({
                                 'date': date.toISOString(),
                                 'type': day.summary.substring(0,1)
-                }).headers({
-                    'x-access-token': token
-                }).end(function(res){
-                    if(res.error)console.log("Error: " + res.error);
-                    console.log(res.body);
-                });
+                        }).headers({
+                                'x-access-token': token
+                        }).end(function(res){
+                                if(res.error)console.log("Error: " + res.error);
+                                console.log(res.body);
+                        });
 
                 }               
+        break;
         }
 
 });

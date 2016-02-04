@@ -2,6 +2,8 @@ var express = require('express')
 var router = express.Router();
 var mongoose = require('mongoose')
 var jwt = require('jsonwebtoken')
+var moment = require('moment')
+var timezone = require('moment-timezome')
 
 var Models = require('../models/ScheduleModels.js')
 var Account = require('../models/Account.js');
@@ -41,9 +43,9 @@ router.get('/', function(req, res) {
 router.get('/day_type', function(req, res, next) {
         var date;
         if(req.query.date == "now") 
-                date = new Date(moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc());
+                date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
         else 
-                date = new Date(req.query.date);
+                date = moment(new Date(req.query.date));
         console.log(date);
         console.log(date.toISOString());
         DayType.findOne({date: date}, function(err, queryResult) {
@@ -207,7 +209,7 @@ router.post('/period', function(req,res){
 router.post('/day_type', function(req,res){
         var userType = req.decoded.account.userType;
         if(userType == "Admin") {
-                var date = moment(req.body.date).hours(6).utcOffset(-6).format();
+                var date = moment(req.body.date).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
                 DayType.create({
                         'date': date,
                         'type': req.body.type
