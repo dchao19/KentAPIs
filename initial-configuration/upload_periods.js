@@ -1,7 +1,8 @@
-var ical = require('ical')
-var unirest = require('unirest')
+var ical = require('ical');
+var unirest = require('unirest');
 var moment = require('moment');
-var config = require('./config.js')
+var config = require('./config.js');
+var timezone = require('moment-timezone');
 
 var serverAddress = config.serverAddress;
 
@@ -23,7 +24,7 @@ req.end(function (res) {
                 if(all_periods.hasOwnProperty(i)) {
                         var event = all_periods[i];
 
-                        var date = moment(event.start).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+                        var date = moment(event.start).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
                         var req = unirest.post(serverAddress + '/schedule/period').type('json').send({
                                 'day' : date.toISOString(), //standardized at 7:00 AM (MDT) the day of the period
                                 'start_time': event.start.toISOString(), //match db schema
@@ -38,15 +39,7 @@ req.end(function (res) {
                         req.end(function(res) {
                             if(res.error) {
                                     console.log(res.error);
-                                    req.end(function(res) {
-                                        if(res.error) {
-                                            console.log("Second Attempt: " + res.error);
-                                        } else {
-                                            console.log("Second Attempt success: " + res.body);
-                                        }
-                                    });
                             }
-                            //console.log(res.body);
                         });
         }
     }
