@@ -3,7 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose')
 var jwt = require('jsonwebtoken')
 var moment = require('moment')
-var timezone = require('moment-timezome')
+var timezone = require('moment-timezone')
 
 var Models = require('../models/ScheduleModels.js')
 var Account = require('../models/Account.js');
@@ -44,10 +44,12 @@ router.get('/day_type', function(req, res, next) {
         var date;
         if(req.query.date == "now") 
                 date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-        else 
-                date = moment(new Date(req.query.date));
-        console.log(date);
-        console.log(date.toISOString());
+        else { 
+                date = moment(req.query.date)
+                var tempDate = moment(req.query.date)
+                date.tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0);
+                date.date(tempDate.date());
+        }
         DayType.findOne({date: date}, function(err, queryResult) {
                 if (err) res.status('400').send({
                         error: "Invalid query"
