@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # KentAPIs documentation build configuration file, created by
-# sphinx-quickstart on Sun Feb 21 18:22:04 2016.
+# sphinx-quickstart on Sun Feb 21 18:34:41 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -14,6 +14,10 @@
 
 import sys
 import os
+import sphinx_rtd_theme
+
+html_theme = "sphinx_rtd_theme"
+html_theme_path = ["_themes", ]
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -46,8 +50,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'KentAPIs'
-copyright = u'2016, Daniel Chao, Alex Clement'
-author = u'Daniel Chao, Alex Clement'
+copyright = u'2016, Alex Clement, Daniel Chao'
+author = u'Alex Clement, Daniel Chao'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -73,7 +77,7 @@ language = None
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = []
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -222,7 +226,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'KentAPIs.tex', u'KentAPIs Documentation',
-     u'Daniel Chao, Alex Clement', 'manual'),
+     u'Alex Clement, Daniel Chao', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
