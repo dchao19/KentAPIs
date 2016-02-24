@@ -28,21 +28,30 @@ passport.deserializeUser(Account.deserializeUser());
  * Unauthenticated routes
  * ****************************/
 
-router.get('/', function(req, res) {
-        res.json('API OK');
-});
-/*
-   router.get('/day_type', function(req, res, next) {
-   var today = moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-   DayType.findOne({date: today.toDate()}, function(error,results){
-   res.json(results);
-   });
-   });
-   */
+/**
+* @api {get} schedule/ API Status
+* @apiName APIStatus
+* @apiGroup Schedule
+* @apiSuccess {String} message API OK 
+*/
 
+router.get('/', function(req, res) {
+        res.json(JSON.stringify({"message": "API OK");
+});
+
+
+/**
+* @api {get} schedule/day_type Day Type (Letterday)
+* @apiName "DayType"
+* @apiDescription This endpoint returns the letter day of a given date, or now if none specified.
+* @apiGroup Schedule
+* @apiParam {String} date=now an ISO 8061 date string
+* @apiSuccess {String} date Date in ISO8061 Format, UTC time
+* @apiSuccess {String} type Letter Day 
+*/
 router.get('/day_type', function(req, res, next) {
         var date;
-        if(req.query.date == "now") 
+        if(req.query.date == "now" || req.query.date == undefined) 
                 date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
         else { 
                 date = moment(req.query.date)
@@ -61,7 +70,18 @@ router.get('/day_type', function(req, res, next) {
                 }
         });
 });
-
+/**
+* @api {get} schedule/all_periods All Periods
+* @apiName "All_Periods"
+* @apiDescription This endpoint returns an array of all of the periods in a date, or today if none is specified.
+* @apiGroup Schedule
+* @apiParam {String} date=now an ISO 8061 date string
+* @apiSuccess {Object[]} periods List of periods in a day.
+* @apiSuccess {String} periods.title Day Type
+* @apiSuccess {String} periods.start_time Start time of period in UTC timezone
+* @apiSuccess {String} periods.end_time End time of period in UTC timezone
+* @apiSuccess {String} periods.day The period's associated day
+*/
 router.get('/all_periods', function(req, res) {
         var date;
         if(req.query.date == "now") 
@@ -96,7 +116,17 @@ router.get('/all_periods', function(req, res) {
         });
 
 });
-
+/**
+* @api {get} schedule/period Period
+* @apiName "Period"
+* @apiDescription This endpoint returns the current period if no date is specified, or the current period in the specified day
+* @apiGroup Schedule
+* @apiParam {String} date=now an ISO 8061 date string
+* @apiSuccess {String} title Day Type
+* @apiSuccess {String} start_time Start time of period in UTC timezone
+* @apiSuccess {String} end_time End time of period in UTC timezone
+* @apiSuccess {String} day The period's associated day
+*/
 router.get('/period', function(req, res) {
         var date;
         if(req.query.date == "now") 
