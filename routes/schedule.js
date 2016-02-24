@@ -36,7 +36,7 @@ passport.deserializeUser(Account.deserializeUser());
 */
 
 router.get('/', function(req, res) {
-        res.json(JSON.stringify({"message": "API OK");
+        res.json({"message": "API OK"});
 });
 
 
