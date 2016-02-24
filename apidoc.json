@@ -1,7 +1,7 @@
 {
   "name": "KentAPIS",
   "version": "0.0.1",
-  "description": "Kent APIs",
+  "description": "An API for Kent Denver School's rotating schedule. All responses are in JSON.",
   "title": "APIs for Kent",
-  "url" : "https://kentapis.org/"
+  "url" : "https://kdsapi.org/"
 }
