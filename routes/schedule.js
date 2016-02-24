@@ -39,17 +39,21 @@ router.get('/', function(req, res) {
    });
    });
    */
-
-router.get('/day_type', function(req, res, next) {
+var handleDate = function(d) {
         var date;
-        if(req.query.date == "now") 
+        if(d == "now") 
                 date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
         else { 
-                date = moment(req.query.date)
-                var tempDate = moment(req.query.date)
+                date = moment(d);
+                var tempDate = moment(d);
                 date.tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0);
                 date.date(tempDate.date());
         }
+        return date;
+}
+
+router.get('/day_type', function(req, res, next) {
+        var date = handleDate(req.query.date);
         DayType.findOne({date: date}, function(err, queryResult) {
                 if (err) res.status('400').send({
                         error: "Invalid query"
@@ -63,18 +67,12 @@ router.get('/day_type', function(req, res, next) {
 });
 
 router.get('/all_periods', function(req, res) {
-        var date;
-        if(req.query.date == "now") 
-                date = new Date(moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc());
-        else 
-                date = new Date(req.query.date);
+        var date = handleDate(req.query.date);
         if(date == "Invalid Date") {
                 res.status('400').send({
                         error: "Invalid date format"
                 });
         }
-        date.setHours(6);
-        console.log(date.toISOString());
         Period.find({day:date.toISOString()}, function(error, result) {
                 if(error) res.status('400').send({
                         error: "Invalid query"
@@ -98,15 +96,15 @@ router.get('/all_periods', function(req, res) {
 });
 
 router.get('/period', function(req, res) {
+        var d = req.query.date;
         var date;
-        if(req.query.date == "now") 
-                date = new Date();
-        else 
-                date = new Date(req.query.date);
-        if(date == "Invalid Date") {
-                res.status('400').send({
-                        error: "Invalid date format"
-                });
+        if(d == "now") 
+                date = moment().tz('Europe/London');
+        else { 
+                date = moment.tz(d, 'America/Denver');
+                date.tz('Europe/London');
+                var tempDate = moment(d);
+                date.date(tempDate.date());
         }
         Period.findOne({
                 $and:[
@@ -116,6 +114,9 @@ router.get('/period', function(req, res) {
                         if(error) res.status('400').send({
                                 error: "Invalid query"
                         });
+                        if(!result) {
+                            res.status(200).json([]);
+                        } else {
                         period = result;
                         pretty_result = {
                                 title:period.title, 
@@ -124,6 +125,7 @@ router.get('/period', function(req, res) {
                                 day:period.day
                         }
                         res.json(200, pretty_result);
+                        }
                 });
 
 });
