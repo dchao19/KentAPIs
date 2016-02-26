@@ -16,7 +16,14 @@
             "description": "<p>API OK</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "API OK",
+          "type": "json"
+        }
+      ]
     },
     "version": "0.0.0",
     "filename": "routes/schedule.js",
@@ -82,7 +89,33 @@
             "description": "<p>The period's associated day</p>"
           }
         ]
-      }
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "[\n    {\n        \"title\": \"Period 1\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    },\n    {\n        \"title\": \"Period 3\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    }\n    ... \n]",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "400",
+            "description": "<p>The date query was formatted incorrectly or is an invalid range.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"error\": \"Invalid date format\"    \n}",
+          "type": "json"
+        }
+      ]
     },
     "version": "0.0.0",
     "filename": "routes/schedule.js",
@@ -125,6 +158,102 @@
             "optional": false,
             "field": "type",
             "description": "<p>Letter Day</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"date\": \"2016-02-26T13:00:00.000Z\",\n    \"type\": \"A\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "400",
+            "description": "<p>The date query was formatted incorrectly or is an invalid range.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"error\": \"Invalid date format\"    \n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/schedule.js",
+    "groupTitle": "Schedule"
+  },
+  {
+    "type": "post",
+    "url": "schedule/get-token",
+    "title": "GetToken",
+    "name": "_Get_Token_",
+    "description": "<p>This endpoint returns a user's token after authentication.</p>",
+    "group": "Schedule",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Account Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Account Password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Token retrieval statusp</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>User token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"message\": \"Here is your token\",\n    \"token\": \"<USER_TOKEN>\" \n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "400",
+            "description": "<p>The user with the given username/password does not exist.</p>"
           }
         ]
       }
@@ -186,7 +315,84 @@
             "description": "<p>The period's associated day</p>"
           }
         ]
+      },
+      "examples": [
+        {
+          "title": "Success-Example:",
+          "content": "{\n    \"title\": \"Period 1\",\n    \"start_time\": \"\",\n    \"end_time\": \"\",\n    \"day\": \"\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "400",
+            "description": "<p>The date query was formatted incorrectly or is an invalid range.</p>"
+          }
+        ]
       }
+    },
+    "version": "0.0.0",
+    "filename": "routes/schedule.js",
+    "groupTitle": "Schedule"
+  },
+  {
+    "type": "post",
+    "url": "schedule/register",
+    "title": "Register Account",
+    "name": "_Register_Account_",
+    "description": "<p>This endpoint creates a user account in the database and returns a token.</p>",
+    "group": "Schedule",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Account Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Account Password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Creation status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>User token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"message\": \"Account created\",\n    \"token\": \"<USER_TOKEN>\"\n}",
+          "type": "json"
+        }
+      ]
     },
     "version": "0.0.0",
     "filename": "routes/schedule.js",
