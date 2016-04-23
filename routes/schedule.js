@@ -84,16 +84,19 @@ router.get('/day_type', function(req, res, next) {
 */
 router.get('/all_periods', function(req, res) {
         var date;
-        if(req.query.date == "now") 
-                date = new Date(moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc());
-        else 
-                date = new Date(req.query.date);
+        if(req.query.date == "now" || req.query.date == undefined) 
+                date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+        else { 
+                date = moment(req.query.date)
+                var tempDate = moment(req.query.date)
+                date.tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0);
+                date.date(tempDate.date());
+        }
         if(date == "Invalid Date") {
                 res.status('400').send({
                         error: "Invalid date format"
                 });
         }
-        date.setHours(6);
         console.log(date.toISOString());
         Period.find({day:date.toISOString()}, function(error, result) {
                 if(error) res.status('400').send({
