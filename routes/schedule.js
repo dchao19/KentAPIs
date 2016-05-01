@@ -258,6 +258,21 @@ router.post('/day_type', function(req,res){
         }                       
 });
 
+router.get('/name_period', function(req,res){
+        Account.findOne({"username": req.decoded.account.username}, function(err, account){
+                if(err) res.json(500, {"message": "An internal server error has occured"});
+                else if(!account) res.json(401, {"message": "No user with the given username could be found."});
+                else {
+                        if(account.classNames === undefined) account.classNames = {};
+                        account.classNames[req.query.period] = req.query.periodName;
+                        account.markModified('classNames');
+                        res.json({"message": "success"});
+                }
+        })
+});
+
+
+
 router.get('/auth-test', function(req, res) {
         res.json('Authentication successful!');
 });
