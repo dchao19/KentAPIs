@@ -18,6 +18,8 @@ var secret = config.secret;
 var passport = require('passport')
 var LocalStrategy = require('passport-local')
 
+var utils = require('../utils/utils.js');
+
 router.use(passport.initialize());
 
 passport.use(new LocalStrategy(Account.authenticate()));
@@ -130,7 +132,7 @@ router.get('/all_periods', function(req, res) {
 * @apiSuccess {String} end_time End time of period in UTC timezone
 * @apiSuccess {String} day The period's associated day
 */
-router.get('/period', function(req, res) {
+router.get('/period', utils.nonStrictAuthentication, function(req, res) {
         var date;
         if(req.query.date == "now") 
                 date = new Date();
@@ -146,17 +148,29 @@ router.get('/period', function(req, res) {
                 {start_time:{$lte:date.toISOString()}}, 
                 {end_time:{$gte:date.toISOString()}}
                 ]}, function(error, result) {
-                        if(error) res.status('400').send({
-                                error: "Invalid query"
-                        });
-                        period = result;
-                        pretty_result = {
-                                title:period.title, 
-                                start_time:period.start_time, 
-                                end_time:period.end_time,
-                                day:period.day
+                        if(error) 
+                                res.status('400').send({ error: "Invalid query" });
+                        else {
+                                var period = result;
+                                pretty_result = {
+                                        title:period.title, 
+                                        start_time:period.start_time, 
+                                        end_time:period.end_time,
+                                        day:period.day
+                                }
+                                if(req.decoded){
+                                        Account.findOne({"username": req.decoded.account.username}, function(err, account){
+                                                if(err) res.json(500, {"message": "An internal server error has occured."});
+                                                else if(!account) res.json(401, {"message": "A user with the given username was not found. Check your token."});
+                                                else {
+                                                        pretty_result.title = account.classNames[pretty_result.title] ? account.classNames[pretty_result.title] : pretty_result.title;
+                                                        res.json(200, pretty_result);
+                                                }
+                                        })
+                                }else {
+                                        res.json(200, pretty_result);
+                                }
                         }
-                        res.json(200, pretty_result);
                 });
 
 });
