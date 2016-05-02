@@ -269,7 +269,7 @@ router.post('/register', function(req, res) {
 * @apiGroup Schedule
 * @apiParam {String} username Account Username
 * @apiParam {String} password Account Password
-* @apiSuccess {String} message Token retrieval statusp
+* @apiSuccess {String} message Token retrieval status
 * @apiSuccess {String} token User token
 * @apiError 400 The user with the given username/password does not exist.
 * @apiSuccessExample {json} Success-Response:
@@ -366,6 +366,7 @@ router.get('/name_period', function(req,res){
                         if(account.classNames === undefined) account.classNames = {};
                         account.classNames[req.query.period] = req.query.periodName;
                         account.markModified('classNames');
+                        account.save();
                         res.json({"message": "success"});
                 }
         })
