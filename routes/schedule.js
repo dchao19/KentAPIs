@@ -4,6 +4,7 @@ var mongoose = require('mongoose')
 var jwt = require('jsonwebtoken')
 var moment = require('moment')
 var timezone = require('moment-timezone')
+var async = require('async');
 
 var Models = require('../models/ScheduleModels.js')
 var Account = require('../models/Account.js');
@@ -84,7 +85,7 @@ router.get('/day_type', function(req, res, next) {
 * @apiSuccess {String} periods.end_time End time of period in UTC timezone
 * @apiSuccess {String} periods.day The period's associated day
 */
-router.get('/all_periods', function(req, res) {
+router.get('/all_periods', authUtils.nonStrictAuthentication, function(req, res) {
         var date;
         if(req.query.date == "now" || req.query.date == undefined) 
                 date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
@@ -99,25 +100,39 @@ router.get('/all_periods', function(req, res) {
                         error: "Invalid date format"
                 });
         }
-        console.log(date.toISOString());
         Period.find({day:date.toISOString()}, function(error, result) {
                 if(error) res.status('400').send({
                         error: "Invalid query"
                 });
                 pretty_result = [];
-                for(var i in result) {
-                        period = result[i];
-                        pretty_result.push({
+                async.each(result, function(period, callback){
+                        var prettyPeriod = {
                                 title:period.title, 
                                 start_time:period.start_time, 
                                 end_time:period.end_time,
                                 day:period.day
-                        });
-                }
-                pretty_result.sort(function(a, b) {
-                        return (new Date(a.start_time)).getTime() - (new Date(b.start_time)).getTime();
+                        };
+
+                        if(req.decoded){
+                                Account.findOne({"username": req.decoded.account.username}, function(err, account){
+                                        if(err) res.json(500, {"message": "An internal server error has occured."});
+                                        else if(!account) res.json(401, {"message": "A user with the given username was not found. Check your token."});
+                                        else {
+                                                prettyPeriod.title = account.classNames[prettyPeriod.title] ? account.classNames[prettyPeriod.title] : prettyPeriod.title;
+                                                pretty_result.push(prettyPeriod);
+                                                callback();
+                                        }
+                                })
+                        }else {
+                                pretty_result.push(prettyPeriod);
+                                callback();
+                        }
+                }, function(err){
+                        pretty_result.sort(function(a, b) {
+                                return (new Date(a.start_time)).getTime() - (new Date(b.start_time)).getTime();
+                        });                        
+                        res.json(200, pretty_result);
                 });
-                res.json(200, pretty_result);
         });
 
 });

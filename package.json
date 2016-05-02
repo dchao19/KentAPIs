@@ -11,6 +11,7 @@
     "url": "https://dchao19@github.com/dchao19/KentScheduleServer.git"
   },
   "dependencies": {
+    "async": "^2.0.0-rc.3",
     "body-parser": "~1.0.1",
     "express": "~4.0.0",
     "ical": "^0.4.0",
