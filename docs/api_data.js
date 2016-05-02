@@ -29,6 +29,19 @@ define({ "api": [
     "name": "_All_Periods_",
     "description": "<p>This endpoint returns an array of all of the periods in a date, or today if none is specified.</p>",
     "group": "Schedule",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": true,
+            "field": "X-Access-Token",
+            "description": "<p>User's unique access token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [
@@ -58,7 +71,7 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "periods.title",
-            "description": "<p>Day Type</p>"
+            "description": "<p>The period number or the user's name for the period provided X-Access-Token was set and the period has been named.</p>"
           },
           {
             "group": "Success 200",
@@ -140,6 +153,19 @@ define({ "api": [
     "name": "_Period_",
     "description": "<p>This endpoint returns the current period if no date is specified, or the current period in the specified day</p>",
     "group": "Schedule",
+    "header": {
+      "fields": {
+        "Header": [
+          {
+            "group": "Header",
+            "type": "String",
+            "optional": true,
+            "field": "X-Access-Token",
+            "description": "<p>User's unique access token</p>"
+          }
+        ]
+      }
+    },
     "parameter": {
       "fields": {
         "Parameter": [

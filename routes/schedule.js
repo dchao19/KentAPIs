@@ -78,9 +78,10 @@ router.get('/day_type', function(req, res, next) {
 * @apiName "All_Periods"
 * @apiDescription This endpoint returns an array of all of the periods in a date, or today if none is specified.
 * @apiGroup Schedule
+* @apiHeader {String} [X-Access-Token] User's unique access token
 * @apiParam {String} date=now an ISO 8061 date string
 * @apiSuccess {Object[]} periods List of periods in a day.
-* @apiSuccess {String} periods.title Day Type
+* @apiSuccess {String} periods.title The period number or the user's name for the period provided X-Access-Token was set and the period has been named.
 * @apiSuccess {String} periods.start_time Start time of period in UTC timezone
 * @apiSuccess {String} periods.end_time End time of period in UTC timezone
 * @apiSuccess {String} periods.day The period's associated day
@@ -141,8 +142,9 @@ router.get('/all_periods', authUtils.nonStrictAuthentication, function(req, res)
 * @apiName "Period"
 * @apiDescription This endpoint returns the current period if no date is specified, or the current period in the specified day
 * @apiGroup Schedule
+* @apiHeader {String} [X-Access-Token] User's unique access token
 * @apiParam {String} date=now an ISO 8061 date string
-* @apiSuccess {String} title Day Type
+* @apiSuccess {String} title The period number or the user's name for the period provided X-Access-Token was set and the period has been named.
 * @apiSuccess {String} start_time Start time of period in UTC timezone
 * @apiSuccess {String} end_time End time of period in UTC timezone
 * @apiSuccess {String} day The period's associated day
