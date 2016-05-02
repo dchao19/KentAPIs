@@ -106,7 +106,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "[\n    {\n        \"title\": \"Period 1\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    },\n    {\n        \"title\": \"Period 3\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    }\n    ... \n]",
+          "content": "[\n    {\n        \"title\": \"English\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    },\n    {\n        \"title\": \"Period 3\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    }\n    ... \n]",
           "type": "json"
         }
       ]
@@ -267,6 +267,75 @@
             "optional": false,
             "field": "400",
             "description": "<p>The user with the given username/password does not exist.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/schedule.js",
+    "groupTitle": "Schedule"
+  },
+  {
+    "type": "get",
+    "url": "schedule/name_period",
+    "title": "Name Period",
+    "name": "_Name_Period_",
+    "description": "<p>This endpoint associates a period number with a user-specifice dname.</p>",
+    "group": "Schedule",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "period",
+            "description": "<p>Period number to replace (ex. &quot;Period 1&quot;)</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "periodName",
+            "description": "<p>Name for the period.</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Success message</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"message\": \"success\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "400",
+            "description": "<p>The user with the given username does not exist.</p>"
+          },
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "500",
+            "description": "<p>An internal server error has occured</p>"
           }
         ]
       }

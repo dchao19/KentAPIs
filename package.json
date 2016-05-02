@@ -4,7 +4,8 @@
   "description": "An API for the Kent Schedule Server widget that uses JavaScript instead of Java. Should work better and be more versatile. ",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "update-docs": "apidoc -i routes -o docs"
   },
   "repository": {
     "type": "git",
