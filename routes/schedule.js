@@ -102,7 +102,7 @@ router.get('/day_type', function(req, res, next) {
 * @apiSuccessExample {json} Success-Response:
 *   [
 *       {
-*           "title": "Period 1",
+*           "title": "English",
 *           "start_time" : "",
 *           "end_time": "",
 *           "day": ""        
@@ -343,7 +343,21 @@ router.post('/day_type', function(req,res){
                 res.json(401, {"message": "You do not have permission to perform that action"});
         }                       
 });
-
+/**
+* @api {get} schedule/name_period Name Period
+* @apiName "Name Period"
+* @apiDescription This endpoint associates a period number with a user-specifice dname.
+* @apiGroup Schedule
+* @apiParam {String} period Period number to replace (ex. "Period 1")
+* @apiParam {String} periodName Name for the period.
+* @apiSuccess {String} message Success message
+* @apiError 400 The user with the given username does not exist.
+* @apiError 500 An internal server error has occured
+* @apiSuccessExample {json} Success-Response:
+*   {
+*       "message": "success"
+*   }
+*/
 router.get('/name_period', function(req,res){
         Account.findOne({"username": req.decoded.account.username}, function(err, account){
                 if(err) res.json(500, {"message": "An internal server error has occured"});
@@ -356,7 +370,6 @@ router.get('/name_period', function(req,res){
                 }
         })
 });
-
 
 
 router.get('/auth-test', function(req, res) {

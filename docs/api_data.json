@@ -317,7 +317,7 @@
             "type": "String",
             "optional": false,
             "field": "title",
-            "description": "<p>Day Type</p>"
+            "description": "<p>The period number or the user's name for the period provided X-Access-Token was set and the period has been named.</p>"
           },
           {
             "group": "Success 200",
