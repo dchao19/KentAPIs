@@ -18,7 +18,7 @@ var secret = config.secret;
 var passport = require('passport')
 var LocalStrategy = require('passport-local')
 
-var utils = require('../utils/utils.js');
+var authUtils = require('../utils/auth.js');
 
 router.use(passport.initialize());
 
@@ -132,7 +132,7 @@ router.get('/all_periods', function(req, res) {
 * @apiSuccess {String} end_time End time of period in UTC timezone
 * @apiSuccess {String} day The period's associated day
 */
-router.get('/period', utils.nonStrictAuthentication, function(req, res) {
+router.get('/period', authUtils.nonStrictAuthentication, function(req, res) {
         var date;
         if(req.query.date == "now") 
                 date = new Date();
@@ -211,7 +211,7 @@ router.post('/get-token', function(req, res) {
 
 //Auth
 
-router.use(utils.strictAuthentication);
+router.use(authUtils.strictAuthentication);
 
 /********************************
  * Authenticated Routes
