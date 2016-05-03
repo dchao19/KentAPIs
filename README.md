@@ -5,14 +5,14 @@ Contributions are welcome.
 
 # Getting Started
 If you wish to build the server yourself, you'll need mongo, node.js, and npm installed. 
-1. First, clone the repository and checkout a branch:
-```
-git clone https://github.com/dchao19/KentAPIs && cd KentAPIs
-git checkout -b more_functionality
-```
-2. `npm install`
-3. Fill out the `config.js` file. You'll need the database address.
-4. Run the server using `npm start`
+  1. First, clone the repository and checkout a branch:
+  ```
+  git clone https://github.com/dchao19/KentAPIs && cd KentAPIs
+  git checkout -b more_functionality
+  ```
+  2. `npm install`
+  3. Fill out the `config.js` file. You'll need the database address.
+  4. Run the server using `npm start`
 
 # Inital Configuration
 In order for the schedule component of the API to work, you'll need to manually execute the following commands.
