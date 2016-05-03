@@ -16,10 +16,10 @@ git checkout -b more_functionality
 
 # Inital Configuration
 In order for the schedule component of the API to work, you'll need to manually execute the following commands.
-1. Start the server normally
-2. Use the `/register` endpoint to create an account
-3. Edit the accounts/user document in the database to read "userType": "Admin"
-4. `cd inital-configuration`
-5. Edit the config.js file with your username, password, and server address.
-6. In a separate command line window, execute
-  1. `node upload_daytypes.js && node upload_periods.js`
+  1. Start the server normally
+  2. Use the `/register` endpoint to create an account
+  3. Edit the accounts/user document in the database to read "userType":  "Admin"
+  4. `cd inital-configuration`
+  5. Edit the config.js file with your username, password, and server address.
+  6. In a separate command line window, execute
+    1. `node upload_daytypes.js && node upload_periods.js`
