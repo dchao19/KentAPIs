@@ -20,7 +20,7 @@ describe('Api status', function() {
         });
         it('should say API OK', function() {
                 unirest.get('http://localhost:' + port + '/schedule').end(function(res) {
-                        expect(res.body).to.equal("API OK");
+                        expect(res.body.message).to.equal("API OK");
                 });
         });
 });
