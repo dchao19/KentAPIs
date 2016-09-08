@@ -295,7 +295,7 @@ router.use(function(req, res, next) {
 router.post('/period', function(req,res){
         var userType = req.decoded.account.userType;
         if(userType == "Admin") {
-                DayType.findOne({date:new Date(req.body.day)}, function(error, result){
+                DayType.findOne({date:req.body.day.toString()}, function(error, result){
                         var poster = {
                                 day: new Date(req.body.day),
                                 start_time: new Date(req.body.start_time),

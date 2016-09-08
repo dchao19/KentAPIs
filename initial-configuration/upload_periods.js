@@ -25,6 +25,7 @@ req.end(function (res) {
                         var event = all_periods[i];
 
                         var date = moment(event.start).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+                        console.log(date.toISOString());
                         var req = unirest.post(serverAddress + '/schedule/period').type('json').send({
                                 'day' : date.toISOString(), //standardized at 7:00 AM (MDT) the day of the period
                                 'start_time': event.start.toISOString(), //match db schema
