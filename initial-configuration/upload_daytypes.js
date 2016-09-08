@@ -22,7 +22,7 @@ var uploadDayTypes = function(callback){
                 if (res.error) throw new Error(res.error);
                 var token = res.body.token;
                 async.each(day_types, function(day, done) {
-                        var date = moment(day.start).tz('America/Denver').hours(6).minutes(0).utc();
+                        var date = moment(day.start).tz('America/Denver').hours(6).minutes(0).add(1, 'd').utc();
                         req = unirest.post(serverAddress + '/schedule/day_type').type('json').send({
                                 'date': date.toISOString(),
                                 'type': day.summary.substring(0,1)
