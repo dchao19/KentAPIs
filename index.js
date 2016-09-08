@@ -31,6 +31,7 @@ var port = process.env.PORT || 8080; // set our port
 // ROUTES FOR OUR API
 // =============================================================================
 var router = require('./routes/schedule.js'); // get an instance of the express Router
+var lunchRouter = require('./routes/lunch.js');
 var router2 = express.Router();
 
 router2.get('/', function(req, res) {
@@ -44,6 +45,7 @@ router2.get('/', function(req, res) {
 // all of our routes will be prefixed with /api OR /apiv2 (depending on which router is used)
 app.use('/schedule', router);
 app.use('/apiv2', router2);
+app.use('/lunch', lunchRouter);
 
 // START THE SERVER
 // =============================================================================
