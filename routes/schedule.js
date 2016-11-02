@@ -32,7 +32,9 @@ passport.deserializeUser(Account.deserializeUser());
 * @api {get} schedule/ API Status
 * @apiName APIStatus
 * @apiGroup Schedule
-* @apiSuccess {String} message API OK 
+* @apiSuccess {String} message API OK
+* @apiSuccessExample Success-Response:
+*   API OK
 */
 
 router.get('/', function(req, res) {
@@ -47,7 +49,18 @@ router.get('/', function(req, res) {
 * @apiGroup Schedule
 * @apiParam {String} date=now an ISO 8061 date string
 * @apiSuccess {String} date Date in ISO8061 Format, UTC time
-* @apiSuccess {String} type Letter Day 
+* @apiSuccess {String} type Letter Day
+* @apiError 400 The date query was formatted incorrectly or is an invalid range. 
+* @apiSuccessExample {json} Success-Response:
+*   {
+*       "date": "2016-02-26T13:00:00.000Z",
+*       "type": "A"
+*   }
+* @apiErrorExample {json} Error-Response:
+*   HTTP/1.1 400 Bad Request
+*   {
+*       "error": "Invalid date format"    
+*   }
 */
 router.get('/day_type', function(req, res, next) {
         var date;
@@ -81,6 +94,28 @@ router.get('/day_type', function(req, res, next) {
 * @apiSuccess {String} periods.start_time Start time of period in UTC timezone
 * @apiSuccess {String} periods.end_time End time of period in UTC timezone
 * @apiSuccess {String} periods.day The period's associated day
+* @apiError 400 The date query was formatted incorrectly or is an invalid range. 
+* @apiSuccessExample {json} Success-Response:
+*   [
+*       {
+*           "title": "Period 1",
+*           "start_time" : "",
+*           "end_time": "",
+*           "day": ""        
+*       },
+*       {
+*           "title": "Period 3",
+*           "start_time" : "",
+*           "end_time": "",
+*           "day": ""        
+*       }
+*       ... 
+*   ]
+* @apiErrorExample {json} Error-Response:
+*   HTTP/1.1 400 Bad Request
+*   {
+*       "error": "Invalid date format"    
+*   }
 */
 router.get('/all_periods', function(req, res) {
         var date;
@@ -129,6 +164,14 @@ router.get('/all_periods', function(req, res) {
 * @apiSuccess {String} start_time Start time of period in UTC timezone
 * @apiSuccess {String} end_time End time of period in UTC timezone
 * @apiSuccess {String} day The period's associated day
+* @apiError 400 The date query was formatted incorrectly or is an invalid range.
+* @apiSuccessExample {json} Success-Example:
+*   {
+*       "title": "Period 1",
+*       "start_time": "",
+*       "end_time": "",
+*       "day": ""
+*   }
 */
 router.get('/period', function(req, res) {
         var date;
@@ -160,7 +203,21 @@ router.get('/period', function(req, res) {
                 });
 
 });
-
+/**
+* @api {post} schedule/register Register Account
+* @apiName "Register Account"
+* @apiDescription This endpoint creates a user account in the database and returns a token.
+* @apiGroup Schedule
+* @apiParam {String} username Account Username
+* @apiParam {String} password Account Password
+* @apiSuccess {String} message Creation status
+* @apiSuccess {String} token User token
+* @apiSuccessExample {json} Success-Response:
+*   {
+*       "message": "Account created",
+*       "token": "<USER_TOKEN>"
+*   }
+*/
 router.post('/register', function(req, res) {
         Account.register(new Account({ username:req.body.username, userType:"User"}), req.body.password, function(err, account) {
                 if(err) {
@@ -174,7 +231,22 @@ router.post('/register', function(req, res) {
                 res.json({message:'Account created', token:token});
         });
 });
-
+/**
+* @api {post} schedule/get-token GetToken
+* @apiName "Get Token"
+* @apiDescription This endpoint returns a user's token after authentication.
+* @apiGroup Schedule
+* @apiParam {String} username Account Username
+* @apiParam {String} password Account Password
+* @apiSuccess {String} message Token retrieval statusp
+* @apiSuccess {String} token User token
+* @apiError 400 The user with the given username/password does not exist.
+* @apiSuccessExample {json} Success-Response:
+*   {
+*       "message": "Here is your token",
+*       "token": "<USER_TOKEN>" 
+*   }
+*/
 router.post('/get-token', function(req, res) {
         Account.findOne({username:req.body.username}, function(err, account) {
                 if(err) {
@@ -223,7 +295,7 @@ router.use(function(req, res, next) {
 router.post('/period', function(req,res){
         var userType = req.decoded.account.userType;
         if(userType == "Admin") {
-                DayType.findOne({date:new Date(req.body.day)}, function(error, result){
+                DayType.findOne({date:req.body.day.toString()}, function(error, result){
                         var poster = {
                                 day: new Date(req.body.day),
                                 start_time: new Date(req.body.start_time),
