@@ -41,7 +41,7 @@ passport.deserializeUser(Account.deserializeUser());
 */
 
 router.get('/', function(req, res) {
-        res.json({"message": "API OK"});
+    res.json({"message": "API OK"});
 });
 
 
@@ -53,7 +53,7 @@ router.get('/', function(req, res) {
 * @apiParam {String} date=now an ISO 8061 date string
 * @apiSuccess {String} date Date in ISO8061 Format, UTC time
 * @apiSuccess {String} type Letter Day
-* @apiError 400 The date query was formatted incorrectly or is an invalid range. 
+* @apiError 400 The date query was formatted incorrectly or is an invalid range.
 * @apiSuccessExample {json} Success-Response:
 *   {
 *       "date": "2016-02-26T13:00:00.000Z",
@@ -62,29 +62,27 @@ router.get('/', function(req, res) {
 * @apiErrorExample {json} Error-Response:
 *   HTTP/1.1 400 Bad Request
 *   {
-*       "error": "Invalid date format"    
+*       "error": "Invalid date format"
 *   }
 */
 router.get('/day_type', function(req, res, next) {
-        var date;
-        if(req.query.date == "now" || req.query.date == undefined) 
-                date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-        else { 
-                date = moment(req.query.date)
-                var tempDate = moment(req.query.date)
-                date.tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0);
-                date.date(tempDate.date());
+    var date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
+        moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
+        moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+
+    DayType.findOne({date: date}, function(err, day) {
+        if(err) {
+            return res.status(500).send({
+                success: false,
+                error: "Internal server error"
+            });
         }
-        DayType.findOne({date: date}, function(err, queryResult) {
-                if (err) res.status('400').send({
-                        error: "Invalid query"
-                });
-                if(queryResult){
-                        res.json({date: queryResult.date, type: queryResult.type});
-                } else {
-                        res.json(400, {error:"Invalid date format"});
-                }
+
+        return res.send({
+            date: day.date,
+            type: date.type
         });
+    });
 });
 /**
 * @api {get} schedule/all_periods All Periods
@@ -98,79 +96,79 @@ router.get('/day_type', function(req, res, next) {
 * @apiSuccess {String} periods.start_time Start time of period in UTC timezone
 * @apiSuccess {String} periods.end_time End time of period in UTC timezone
 * @apiSuccess {String} periods.day The period's associated day
-* @apiError 400 The date query was formatted incorrectly or is an invalid range. 
+* @apiError 400 The date query was formatted incorrectly or is an invalid range.
 * @apiSuccessExample {json} Success-Response:
 *   [
 *       {
 *           "title": "English",
 *           "start_time" : "",
 *           "end_time": "",
-*           "day": ""        
+*           "day": ""
 *       },
 *       {
 *           "title": "Period 3",
 *           "start_time" : "",
 *           "end_time": "",
-*           "day": ""        
+*           "day": ""
 *       }
-*       ... 
+*       ...
 *   ]
 * @apiErrorExample {json} Error-Response:
 *   HTTP/1.1 400 Bad Request
 *   {
-*       "error": "Invalid date format"    
+*       "error": "Invalid date format"
 *   }
 */
 router.get('/all_periods', authUtils.nonStrictAuthentication, function(req, res) {
-        var date;
-        if(req.query.date == "now" || req.query.date == undefined) 
-                date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-        else { 
-                date = moment(req.query.date)
-                var tempDate = moment(req.query.date)
-                date.tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0);
-                date.date(tempDate.date());
-        }
-        if(date == "Invalid Date") {
-                res.status('400').send({
-                        error: "Invalid date format"
-                });
-        }
-        Period.find({day:date.toISOString()}, function(error, result) {
-                if(error) res.status('400').send({
-                        error: "Invalid query"
-                });
-                pretty_result = [];
-                async.each(result, function(period, callback){
-                        var prettyPeriod = {
-                                title:period.title, 
-                                start_time:period.start_time, 
-                                end_time:period.end_time,
-                                day:period.day
-                        };
+    var date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
+        moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
+        moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
 
-                        if(req.decoded){
-                                Account.findOne({"username": req.decoded.account.username}, function(err, account){
-                                        if(err) res.json(500, {"message": "An internal server error has occured."});
-                                        else if(!account) res.json(401, {"message": "A user with the given username was not found. Check your token."});
-                                        else {
-                                                prettyPeriod.title = account.classNames[prettyPeriod.title] ? account.classNames[prettyPeriod.title] : prettyPeriod.title;
-                                                pretty_result.push(prettyPeriod);
-                                                callback();
-                                        }
-                                })
-                        }else {
-                                pretty_result.push(prettyPeriod);
-                                callback();
-                        }
-                }, function(err){
-                        pretty_result.sort(function(a, b) {
-                                return (new Date(a.start_time)).getTime() - (new Date(b.start_time)).getTime();
-                        });                        
-                        res.json(200, pretty_result);
-                });
+    if(!date.isValid()) {
+        res.status(400).send({
+            success: false,
+            error: "Unable to parse date provided in request"
         });
+    }
+        
+    Period.find({day: date.toISOString()},'-linked_day -_id -_v', function(error, periods) {
+        if(error) res.status(500).send({
+            success: false,
+            error: "Internal server error"
+        });
+        
+        result = [];
+        async.each(periods, function(period, callback){
+            if(req.decoded){
+                Account.findOne({username: req.decoded.account.username}, function(err, account){
+                    if(err) {
+                        return res.status(500).send({
+                            success: false,
+                            message: "An internal server error has occured."
+                        });
+                    } else if(!account) {
+                        return res.status(404).send({
+                            success: false,
+                            message: "A user with the given username was not found. Check your token."
+                        });
+                    } else {
+                        period.title = account.classNames[period.title] ? account.classNames[period.title] : period.title;
+                        result.push(period);
+                        callback();
+                    }
+                });
+            } else {
+                result = periods;
+                callback();
+            }
+        }, function(err){
+            result.sort(function(a, b) {
+                return (new Date(a.start_time)).getTime() - (new Date(b.start_time)).getTime();
+            });
 
+            res.json(result);
+        });
+    });
 });
 /**
 * @api {get} schedule/period Period
@@ -193,45 +191,49 @@ router.get('/all_periods', authUtils.nonStrictAuthentication, function(req, res)
 *   }
 */
 router.get('/period', authUtils.nonStrictAuthentication, function(req, res) {
-        var date;
-        if(req.query.date == "now") 
-                date = new Date();
-        else 
-                date = new Date(req.query.date);
-        if(date == "Invalid Date") {
-                res.status('400').send({
-                        error: "Invalid date format"
+    let date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
+        moment() :
+        moment(req.query.date); //moment date parsing tends to be more flexible, specifically with timezones
+
+    if(!date.isValid()) {
+        res.status(400).send({
+            success: false,
+            error: "Unable to parse date provided in request"
+        });
+    }
+
+    Period.findOne(
+        {
+            $and: [
+                {start_time: {$lte: date.toISOString()}}, //Now "is a period" if the time is in between the start/end time of a period
+                {end_time: {$gte: date.toISOString()}}
+            ]
+        }, 
+        '-linked_day -_id -_v',
+        function(error, period) {
+            if(error) {
+                res.status(500).send({
+                    success: false
                 });
-        }
-        Period.findOne({
-                $and:[
-                {start_time:{$lte:date.toISOString()}}, 
-                {end_time:{$gte:date.toISOString()}}
-                ]}, function(error, result) {
-                        if(error) 
-                                res.status('400').send({ error: "Invalid query" });
+            } else if(period) {
+                //If the user supplied a token that was able to decoded, check for the classNames that might be defined
+                if(req.decoded) {
+                    Account.findOne({username: req.decoded.account.username}, function(err, account){
+                        if(err) res.json(500, {"message": "An internal server error has occured."});
+                        else if(!account) res.json(401, {"message": "A user with the given username was not found. Check your token."});
                         else {
-                                var period = result;
-                                pretty_result = {
-                                        title:period.title, 
-                                        start_time:period.start_time, 
-                                        end_time:period.end_time,
-                                        day:period.day
-                                }
-                                if(req.decoded){
-                                        Account.findOne({"username": req.decoded.account.username}, function(err, account){
-                                                if(err) res.json(500, {"message": "An internal server error has occured."});
-                                                else if(!account) res.json(401, {"message": "A user with the given username was not found. Check your token."});
-                                                else {
-                                                        pretty_result.title = account.classNames[pretty_result.title] ? account.classNames[pretty_result.title] : pretty_result.title;
-                                                        res.json(200, pretty_result);
-                                                }
-                                        })
-                                }else {
-                                        res.json(200, pretty_result);
-                                }
+                            //If the account has a named period, rename it in the response accordingly
+                            period.title = account.classNames[period.title] ? account.classNames[period.title] : period.title;
+                            res.send(period);
                         }
-                });
+                    });
+                } else {
+                    res.send(period);
+                }
+            } else {
+                res.send({});
+            }
+    });
 
 });
 /**
@@ -250,17 +252,17 @@ router.get('/period', authUtils.nonStrictAuthentication, function(req, res) {
 *   }
 */
 router.post('/register', function(req, res) {
-        Account.register(new Account({ username:req.body.username, userType:"User"}), req.body.password, function(err, account) {
-                if(err) {
-                        return res.json({message:'Error creating account', account: account});
-                }
-
-                var token = jwt.sign({account: account}, secret, {
-                        expiresIn: "365 days"
-                });
-
-                res.json({message:'Account created', token:token});
+    Account.register(new Account({username: req.body.username, userType: "User"}), req.body.password, function(err, account) {
+        if(err) {
+            return res.json({message:'Error creating account', account: account});
+        }
+        
+        var token = jwt.sign({account: account}, secret, {
+            expiresIn: "365 days"
         });
+
+        res.json({message:'Account created', token:token});    
+    });
 });
 /**
 * @api {post} schedule/get-token GetToken
@@ -275,7 +277,7 @@ router.post('/register', function(req, res) {
 * @apiSuccessExample {json} Success-Response:
 *   {
 *       "message": "Here is your token",
-*       "token": "<USER_TOKEN>" 
+*       "token": "<USER_TOKEN>"
 *   }
 */
 router.post('/get-token', function(req, res) {
@@ -308,40 +310,53 @@ router.use(authUtils.strictAuthentication);
 
 router.post('/period', function(req,res){
         var userType = req.decoded.account.userType;
-        if(userType == "Admin") {
-                DayType.findOne({date:req.body.day.toString()}, function(error, result){
-                        var poster = {
-                                day: new Date(req.body.day),
-                                start_time: new Date(req.body.start_time),
-                                end_time: new Date(req.body.end_time),
-                                title: req.body.title,
-                                linked_day: result._id
-                        };
-                        Period.create(poster, function(err, post){
-                                if(err) res.json("error");
-                                res.json(post);
-                        });   
+        if (userType == "Admin") {
+                DayType.findOne({ date: req.body.day }, function(error, result) {
+                        if (error) {
+                            return res.status(500).send({
+                                success: false
+                            });
+                        } else if (result) {
+                                var newPeriod = new Period({
+                                        day: new Date(req.body.day),
+                                        start_time: new Date(req.body.start_time),
+                                        end_time: new Date(req.body.end_time),
+                                        title: req.body.title,
+                                        linked_day: result._id
+                                });
+                                newPeriod.save((err, result) => {
+                                    if (err) {
+                                        return res.status(500).send({
+                                            success: false
+                                        });
+                                    }
+
+                                    return res.send({
+                                        period: newPeriod
+                                    });
+                                });
+                        }
                 });
         } else {
                 res.json(401, {"message": "You do not have permission to perform that action"});
-        }                       
+        }
 });
 
 router.post('/day_type', function(req,res){
-        var userType = req.decoded.account.userType;
-        if(userType == "Admin") {
-                var date = moment(req.body.date).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-                DayType.create({
-                        'date': date,
-                        'type': req.body.type
-                },
-                function(err,post){
-                        if(err) res.json("error");
-                        res.json(post);
-                });
-        } else {
-                res.json(401, {"message": "You do not have permission to perform that action"});
-        }                       
+    var userType = req.decoded.account.userType;
+    if(userType == "Admin") {
+        var date = moment(req.body.date).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+        DayType.create({
+            'date': date,
+            'type': req.body.type
+        },
+        function(err,post){
+            if(err) res.json("error");
+                res.json(post);
+            });
+    } else {
+        res.json(401, {"message": "You do not have permission to perform that action"});
+    }
 });
 /**
 * @api {get} schedule/name_period Name Period
@@ -359,17 +374,20 @@ router.post('/day_type', function(req,res){
 *   }
 */
 router.get('/name_period', function(req,res){
-        Account.findOne({"username": req.decoded.account.username}, function(err, account){
-                if(err) res.json(500, {"message": "An internal server error has occured"});
-                else if(!account) res.json(401, {"message": "No user with the given username could be found."});
-                else {
-                        if(account.classNames === undefined) account.classNames = {};
-                        account.classNames[req.query.period] = req.query.periodName;
-                        account.markModified('classNames');
-                        account.save();
-                        res.json({"message": "success"});
-                }
-        })
+    Account.findOne({"username": req.decoded.account.username}, function(err, account){
+        if(err) res.json(500, {"message": "An internal server error has occured"});
+        else if(!account) res.json(401, {"message": "No user with the given username could be found."});
+        else {
+            if(account.classNames === undefined) {
+                account.classNames = {};
+            }
+            account.classNames[req.query.period] = req.query.periodName;
+            account.markModified('classNames');
+            account.save();
+
+            res.send({"message": "success"});
+        }
+    });
 });
 
 
