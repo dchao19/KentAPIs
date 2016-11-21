@@ -70,7 +70,7 @@ router.get('/day_type', function(req, res, next) {
         moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
         moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
 
-    DayType.findOne({date: date}, function(err, day) {
+    DayType.findOne({date: date.toISOString()}, function(err, day) {
         if(err) {
             return res.status(500).send({
                 success: false,
@@ -78,9 +78,16 @@ router.get('/day_type', function(req, res, next) {
             });
         }
 
+        if (day) {
+            return res.send({
+                date: day.date,
+                type: date.type
+            });
+        }
+        
         return res.send({
-            date: day.date,
-            type: date.type
+            date: "No school",
+            type: "No"
         });
     });
 });
