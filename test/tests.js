@@ -58,11 +58,11 @@ describe('Stop server', function() {
 
 function getDay(date, cb) {
         unirest.get('http://localhost:' + port + '/schedule/day_type?date=' + date.format("YYYY-MM-DD")).end(function(res) {
-                if(res.body.date) {
+                if(res.body.type !== 'X') {
                         var dayType = res.body.type;
                         unirest.get('http://localhost:' + port + '/schedule/all_periods?date=' + date.format("YYYY-MM-DD")).end(function(res2) {
                                 cb(res2.body);
-                });
+                        });
                 } else {
                         cb("No school");
                 }

@@ -10,7 +10,7 @@ var serverAddress = config.serverAddress;
 var day_types = ical.parseFile('./resources/AllDayTypes.ics');
 
 var uploadDayTypes = function(callback){
-        var req = unirest.post(serverAddress + "/schedule/get-token");
+        var req = unirest.post(serverAddress + "/schedule/get_token");
 
         req.headers({
                 "content-type": "application/x-www-form-urlencoded",
