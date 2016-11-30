@@ -42,5 +42,8 @@
   "bugs": {
     "url": "https://github.com/dchao19/KentScheduleServer/issues"
   },
-  "homepage": "https://github.com/dchao19/KentScheduleServer"
+  "homepage": "https://github.com/dchao19/KentScheduleServer",
+  "devDependencies": {
+    "apidoc": "^0.16.1"
+  }
 }

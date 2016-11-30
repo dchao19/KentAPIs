@@ -32,8 +32,8 @@ passport.deserializeUser(Account.deserializeUser());
  * ****************************/
 
 /**
-* @api {get} schedule/ API Status
-* @apiName APIStatus
+* @api {get} schedule/ Schedule API Status
+* @apiName Schedule API Status
 * @apiGroup Schedule
 * @apiSuccess {String} message API OK
 * @apiSuccessExample Success-Response:
@@ -51,13 +51,18 @@ router.get('/', function(req, res) {
 * @apiDescription This endpoint returns the letter day of a given date, or now if none specified.
 * @apiGroup Schedule
 * @apiParam {String} date=now an ISO 8061 date string
-* @apiSuccess {String} date Date in ISO8061 Format, UTC time
-* @apiSuccess {String} type Letter Day
+* @apiSuccess {String} date Date in ISO8061 Format, UTC time or "No school"
+* @apiSuccess {String} type Letter Day, "X" if no school
 * @apiError 400 The date query was formatted incorrectly or is an invalid range.
 * @apiSuccessExample {json} Success-Response:
 *   {
 *       "date": "2016-02-26T13:00:00.000Z",
 *       "type": "A"
+*   }
+* @apiSuccessExample {json} Success-Response:
+*   {
+*       "date": "No school",
+*       "type": "X"
 *   }
 * @apiErrorExample {json} Error-Response:
 *   HTTP/1.1 400 Bad Request
@@ -247,7 +252,7 @@ router.get('/period', authUtils.nonStrictAuthentication, function(req, res) {
 * @api {post} schedule/register Register Account
 * @apiName "Register Account"
 * @apiDescription This endpoint creates a user account in the database and returns a token.
-* @apiGroup Schedule
+* @apiGroup Authentication
 * @apiParam {String} username Account Username
 * @apiParam {String} password Account Password
 * @apiSuccess {String} message Creation status
@@ -272,10 +277,10 @@ router.post('/register', function(req, res) {
     });
 });
 /**
-* @api {post} schedule/get-token GetToken
+* @api {post} schedule/get_token Get Token
 * @apiName "Get Token"
 * @apiDescription This endpoint returns a user's token after authentication.
-* @apiGroup Schedule
+* @apiGroup Authentication
 * @apiParam {String} username Account Username
 * @apiParam {String} password Account Password
 * @apiSuccess {String} message Token retrieval status
