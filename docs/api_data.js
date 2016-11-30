@@ -1,9 +1,137 @@
 define({ "api": [
   {
+    "type": "post",
+    "url": "schedule/get_token",
+    "title": "Get Token",
+    "name": "_Get_Token_",
+    "description": "<p>This endpoint returns a user's token after authentication.</p>",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Account Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Account Password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Token retrieval status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>User token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"message\": \"Here is your token\",\n    \"token\": \"<USER_TOKEN>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "error": {
+      "fields": {
+        "Error 4xx": [
+          {
+            "group": "Error 4xx",
+            "optional": false,
+            "field": "400",
+            "description": "<p>The user with the given username/password does not exist.</p>"
+          }
+        ]
+      }
+    },
+    "version": "0.0.0",
+    "filename": "routes/schedule.js",
+    "groupTitle": "Authentication"
+  },
+  {
+    "type": "post",
+    "url": "schedule/register",
+    "title": "Register Account",
+    "name": "_Register_Account_",
+    "description": "<p>This endpoint creates a user account in the database and returns a token.</p>",
+    "group": "Authentication",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "username",
+            "description": "<p>Account Username</p>"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "password",
+            "description": "<p>Account Password</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Creation status</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>User token</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"message\": \"Account created\",\n    \"token\": \"<USER_TOKEN>\"\n}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/schedule.js",
+    "groupTitle": "Authentication"
+  },
+  {
     "type": "get",
     "url": "schedule/",
-    "title": "API Status",
-    "name": "APIStatus",
+    "title": "Schedule API Status",
+    "name": "Schedule_API_Status",
     "group": "Schedule",
     "success": {
       "fields": {
@@ -106,7 +234,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "[\n    {\n        \"title\": \"English\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    },\n    {\n        \"title\": \"Period 3\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"        \n    }\n    ... \n]",
+          "content": "[\n    {\n        \"title\": \"English\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"\n    },\n    {\n        \"title\": \"Period 3\",\n        \"start_time\" : \"\",\n        \"end_time\": \"\",\n        \"day\": \"\"\n    }\n    ...\n]",
           "type": "json"
         }
       ]
@@ -125,7 +253,7 @@ define({ "api": [
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 400 Bad Request\n{\n    \"error\": \"Invalid date format\"    \n}",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"error\": \"Invalid date format\"\n}",
           "type": "json"
         }
       ]
@@ -163,14 +291,14 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "date",
-            "description": "<p>Date in ISO8061 Format, UTC time</p>"
+            "description": "<p>Date in ISO8061 Format, UTC time or &quot;No school&quot;</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "type",
-            "description": "<p>Letter Day</p>"
+            "description": "<p>Letter Day, &quot;X&quot; if no school</p>"
           }
         ]
       },
@@ -178,6 +306,11 @@ define({ "api": [
         {
           "title": "Success-Response:",
           "content": "{\n    \"date\": \"2016-02-26T13:00:00.000Z\",\n    \"type\": \"A\"\n}",
+          "type": "json"
+        },
+        {
+          "title": "Success-Response:",
+          "content": "{\n    \"date\": \"No school\",\n    \"type\": \"X\"\n}",
           "type": "json"
         }
       ]
@@ -196,80 +329,10 @@ define({ "api": [
       "examples": [
         {
           "title": "Error-Response:",
-          "content": "HTTP/1.1 400 Bad Request\n{\n    \"error\": \"Invalid date format\"    \n}",
+          "content": "HTTP/1.1 400 Bad Request\n{\n    \"error\": \"Invalid date format\"\n}",
           "type": "json"
         }
       ]
-    },
-    "version": "0.0.0",
-    "filename": "routes/schedule.js",
-    "groupTitle": "Schedule"
-  },
-  {
-    "type": "post",
-    "url": "schedule/get-token",
-    "title": "GetToken",
-    "name": "_Get_Token_",
-    "description": "<p>This endpoint returns a user's token after authentication.</p>",
-    "group": "Schedule",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Account Username</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Account Password</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "message",
-            "description": "<p>Token retrieval statusp</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>User token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "{\n    \"message\": \"Here is your token\",\n    \"token\": \"<USER_TOKEN>\" \n}",
-          "type": "json"
-        }
-      ]
-    },
-    "error": {
-      "fields": {
-        "Error 4xx": [
-          {
-            "group": "Error 4xx",
-            "optional": false,
-            "field": "400",
-            "description": "<p>The user with the given username/password does not exist.</p>"
-          }
-        ]
-      }
     },
     "version": "0.0.0",
     "filename": "routes/schedule.js",
@@ -430,64 +493,6 @@ define({ "api": [
           }
         ]
       }
-    },
-    "version": "0.0.0",
-    "filename": "routes/schedule.js",
-    "groupTitle": "Schedule"
-  },
-  {
-    "type": "post",
-    "url": "schedule/register",
-    "title": "Register Account",
-    "name": "_Register_Account_",
-    "description": "<p>This endpoint creates a user account in the database and returns a token.</p>",
-    "group": "Schedule",
-    "parameter": {
-      "fields": {
-        "Parameter": [
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "username",
-            "description": "<p>Account Username</p>"
-          },
-          {
-            "group": "Parameter",
-            "type": "String",
-            "optional": false,
-            "field": "password",
-            "description": "<p>Account Password</p>"
-          }
-        ]
-      }
-    },
-    "success": {
-      "fields": {
-        "Success 200": [
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "message",
-            "description": "<p>Creation status</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "token",
-            "description": "<p>User token</p>"
-          }
-        ]
-      },
-      "examples": [
-        {
-          "title": "Success-Response:",
-          "content": "{\n    \"message\": \"Account created\",\n    \"token\": \"<USER_TOKEN>\"\n}",
-          "type": "json"
-        }
-      ]
     },
     "version": "0.0.0",
     "filename": "routes/schedule.js",
