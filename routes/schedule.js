@@ -287,7 +287,7 @@ router.post('/register', function(req, res) {
 *       "token": "<USER_TOKEN>"
 *   }
 */
-router.post('/get_token', function(req, res) {
+router.post('/get*token', function(req, res) {
     Account.findOne({username:req.body.username}, function(err, account) {
         if(err) {
             res.json(400, {error: 'User not found'});
