@@ -87,7 +87,7 @@ router.get('/day_type', function(req, res, next) {
         
         return res.send({
             date: "No school",
-            type: "No"
+            type: "X"
         });
     });
 });
@@ -138,7 +138,7 @@ router.get('/all_periods', authUtils.nonStrictAuthentication, function(req, res)
         });
     }
         
-    Period.find({day: date.toISOString()},'-linked_day -_id -_v', function(error, periods) {
+    Period.find({day: date.toISOString()},'-linked_day -_id -__v', function(error, periods) {
         if(error) res.status(500).send({
             success: false,
             error: "Internal server error"
@@ -216,7 +216,7 @@ router.get('/period', authUtils.nonStrictAuthentication, function(req, res) {
                 {end_time: {$gte: date.toISOString()}}
             ]
         }, 
-        '-linked_day -_id -_v',
+        '-linked_day -_id -__v',
         function(error, period) {
             if(error) {
                 res.status(500).send({
@@ -287,24 +287,23 @@ router.post('/register', function(req, res) {
 *       "token": "<USER_TOKEN>"
 *   }
 */
-router.post('/get-token', function(req, res) {
-        Account.findOne({username:req.body.username}, function(err, account) {
-                if(err) {
-                        res.json(400, {error: 'User not found'});
-                }
+router.post('/get_token', function(req, res) {
+    Account.findOne({username:req.body.username}, function(err, account) {
+        if(err) {
+            res.json(400, {error: 'User not found'});
+        }
 
-                var token = jwt.sign({account: account}, secret, {
-                        expiresIn: "365 days"
-                });
-
-                passport.authenticate('local')(req, res, function() {
-                        res.json({
-                                message: 'Here is your token',
-                                token: token
-                        });
-                });
-
+        var token = jwt.sign({account: account}, secret, {
+            expiresIn: "365 days"
         });
+
+        passport.authenticate('local')(req, res, function() {
+            res.json({
+                message: 'Here is your token',
+                token: token
+            });
+        });
+    });
 });
 
 //Auth
