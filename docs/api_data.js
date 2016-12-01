@@ -129,6 +129,119 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "lunch/force_update",
+    "title": "Force Lunch Data Update",
+    "name": "Force_Lunch_Data_Update",
+    "group": "Lunch",
+    "description": "<p>Although downloading the lunch data happens automagically everyday at 6:00 AM server time, this endpoint will force the download of the data.</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "success",
+            "description": "<p>Success of download.</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>Additonal info.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "  {\n\t\t\"success\": true,\n\t\t\"message\": \"Update forced.\"\n\t}",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/lunch.js",
+    "groupTitle": "Lunch"
+  },
+  {
+    "type": "get",
+    "url": "lunch/menu_image",
+    "title": "Get Lunch Menu",
+    "name": "Get_Lunch_Menu",
+    "group": "Lunch",
+    "description": "<p>This endpoint, when loaded in a web browser, will return the image of the lunch menu of the date specified, or today if none is specified. If it is a weekend, it defaults to monday.</p>",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "optional": false,
+            "field": "date",
+            "defaultValue": "now",
+            "description": "<p>an ISO 8061 date string</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Image/Data",
+            "optional": false,
+            "field": "n/a",
+            "description": "<p>Image data.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "\"There is no example. It returns the lunch menu.\"",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/lunch.js",
+    "groupTitle": "Lunch"
+  },
+  {
+    "type": "get",
+    "url": "lunch/",
+    "title": "Lunch API Status",
+    "name": "Lunch_API_Status",
+    "group": "Lunch",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>The Lunch API is in BETA. The functionality and structure of endpoints and routes WILL change.</p>"
+          }
+        ]
+      },
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "  {\n\t\t\"message\": \"The Lunch API is in BETA. The functionality and structure of endpoints and routes WILL change.\"\n  }",
+          "type": "json"
+        }
+      ]
+    },
+    "version": "0.0.0",
+    "filename": "routes/lunch.js",
+    "groupTitle": "Lunch"
+  },
+  {
+    "type": "get",
     "url": "schedule/",
     "title": "Schedule API Status",
     "name": "Schedule_API_Status",
@@ -304,12 +417,12 @@ define({ "api": [
       },
       "examples": [
         {
-          "title": "Success-Response:",
+          "title": "Normal School Day",
           "content": "{\n    \"date\": \"2016-02-26T13:00:00.000Z\",\n    \"type\": \"A\"\n}",
           "type": "json"
         },
         {
-          "title": "Success-Response:",
+          "title": "No School",
           "content": "{\n    \"date\": \"No school\",\n    \"type\": \"X\"\n}",
           "type": "json"
         }
