@@ -5,8 +5,7 @@
 var express = require('express'); // call express
 var app = express(); // define our app using express
 var bodyParser = require('body-parser');
-moment = require('moment');
-today = moment("2015-11-9 9:02 AM", "YYYY-MM-DD hh:mm A"); //global instance of right now in moment
+var moment = require('moment');
 var config = require('./config.js');
 
 //Set-up database
@@ -30,18 +29,33 @@ app.use(bodyParser.json());
 // ROUTES FOR OUR API
 // =============================================================================
 var router = require('./routes/schedule.js'); // get an instance of the express Router
-var router2 = express.Router();
-
-router2.get('/', function(req, res) {
-    res.json({
-        message: "API v2 OK"
-    });
-});
-
+var lunch = require('./routes/lunch.js');
 
 // REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api OR /apiv2 (depending on which router is used)
 app.use('/schedule', router);
-app.use('/apiv2', router2);
+app.use('/lunch', lunch);
+
+//Schedule the download of lunch data
+var scheduleUtils = require('./utils/scheduleLunchDownload.js');
+scheduleUtils.schedule('0 0 6 * * *', () => {
+    scheduleUtils.download()
+    .then((data) => {
+        scheduleUtils.cache(data, `lunchdata/lunchdata.txt`)
+        .catch((error) => {
+            console.error('Error saving the lunch data to file.');
+        })
+    })
+    .catch((error) => {
+        console.error('Error downloading lunch data.');
+    })
+});
+
+//create folders for lunch data
+
+var lunchUtils = require('./utils/lunchutil.js');
+lunchUtils.createFolders([
+    'lunchdata',
+    'lunchdata/menus'
+]);
 
 module.exports = app;

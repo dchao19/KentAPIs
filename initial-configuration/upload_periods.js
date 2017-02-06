@@ -10,7 +10,7 @@ var serverAddress = config.serverAddress;
 var all_periods = ical.parseFile('./resources/AllPeriods.ics');
 
 var uploadDayTypes = function(callback){
-        var req = unirest.post(serverAddress + "/schedule/get-token");
+        var req = unirest.post(serverAddress + "/schedule/get_token");
 
         req.headers({
                 "content-type": "application/x-www-form-urlencoded",
@@ -23,7 +23,6 @@ var uploadDayTypes = function(callback){
                 var token = res.body.token;
                 async.each(all_periods, function(event, done){
                         var date = moment(event.start).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-                        console.log(date.toISOString());
                         var req = unirest.post(serverAddress + '/schedule/period').type('json').send({
                                 'day' : date.toISOString(), //standardized at 7:00 AM (MDT) the day of the period
                                 'start_time': event.start.toISOString(), //match db schema

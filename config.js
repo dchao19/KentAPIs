@@ -1,5 +1,5 @@
 var databaseUrl = process.env.NODE_ENV === 'testing' ?
-    '127.0.0.1:27017' :
+    'mongodb://127.0.0.1:27017/kentapis' :
     "<YOUR_DATABASE_URL>"
 
 module.exports = {
