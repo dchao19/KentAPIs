@@ -24,16 +24,19 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-
+app.set('view engine', 'pug');
+app.use('/static', express.static('static'));
 
 // ROUTES FOR OUR API
 // =============================================================================
 var router = require('./routes/schedule.js'); // get an instance of the express Router
 var lunch = require('./routes/lunch.js');
+var admin = require('./routes/admin.js')
 
 // REGISTER OUR ROUTES -------------------------------
 app.use('/schedule', router);
 app.use('/lunch', lunch);
+app.use('/admin', admin);
 
 //Schedule the download of lunch data
 var scheduleUtils = require('./utils/scheduleLunchDownload.js');

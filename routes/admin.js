@@ -27,15 +27,24 @@ passport.use(new LocalStrategy(Account.authenticate()));
 passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
-router.use(authUrls.strictAuthentication);
+// router.use(authUtils.strictAuthentication);
 
 // TODO specify templates
 
-router.get('/admin', function(req, res){
+function genericContext(){
+  return {
+    static_path: '/static',
+    display_title: 'ER MAH GERD',
+    title: 'yup, so pro'
+  };
+}
+
+router.get('/panel', function(req, res){
   // TODO return render admin-panel
+  return res.render('base', genericContext());
 });
 
-router.get('/admin/days', function(req, res){
+router.get('/days', function(req, res){
   let date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
       moment() :
       moment(req.query.date);
@@ -50,7 +59,7 @@ router.get('/admin/days', function(req, res){
   }
 
   DayType.find({ date:{$gte: date} }).
-  select({date: 1, type: 1})
+  select({date: 1, type: 1}).
   limit(num_days).
   sort({date: 1}).
   exec(function(err, days){
@@ -61,14 +70,16 @@ router.get('/admin/days', function(req, res){
       })
     }else{
       // TODO return render days
-      return res.render('days', days);
+      ctx = genericContext();
+      ctx.days = days;
+        return res.render('days', ctx);
       // days: [{date, type}]
     }
   })
 
 });
 
-router.get('/admin/day', function(req, res){
+router.get('/day', function(req, res){
   let date = (req.query.date == 'now' || typeof req.query.date == 'undefined') ?
   moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
   moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
@@ -91,7 +102,7 @@ router.get('/admin/day', function(req, res){
   });
 });
 
-router.get('/admin/period', function(req, res){
+router.get('/period', function(req, res){
   let date = (req.query.date == 'now' || typeof req.query.date == 'undefined') ?
     moment() :
     moment(req.query.date);
@@ -121,7 +132,7 @@ router.get('/admin/period', function(req, res){
 
 });
 
-router.post('/admin/update_period', function(req, res){
+router.post('/update_period', function(req, res){
   // Change period number, start/end time
   // Or, if no date if found, creates a new one
   let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
@@ -151,7 +162,7 @@ router.post('/admin/update_period', function(req, res){
     });
 });
 
-router.post('/admin/delete_period', function(req, res){
+router.post('/delete_period', function(req, res){
   // Delete a period
   let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
   if(!date) return res.json(400, {success:false, error:"No date provided"});
@@ -164,7 +175,7 @@ router.post('/admin/delete_period', function(req, res){
 });
 
 
-router.post('/admin/delete_day', function(req, res){
+router.post('/delete_day', function(req, res){
   // delete a day
 
   // should delete associated periods? TODO
@@ -186,7 +197,7 @@ router.post('/admin/delete_day', function(req, res){
   })
 });
 
-router.post('/admin/update_day', function(req, res){
+router.post('/update_day', function(req, res){
   // update a day's day type
   // or, if the day is not found, make it
   let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
@@ -211,3 +222,4 @@ router.post('/admin/update_day', function(req, res){
 // router.post('/admin/move_day', function(req, res){
 //   // move's a day and all associated periods
 // })
+module.exports = router;

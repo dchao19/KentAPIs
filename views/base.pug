@@ -1,14 +1,14 @@
 html
     head
         title KDSAPI Admin - #{title}
-        link(rel='stylesheet' href='#{static_path}/material.min.css')
+        link(rel='stylesheet' href=static_path + '/material.min.css')
         block scripts
-            script(src='#{static_path}/base_scripts.js')
+            script(src=static_path + '/base_scripts.js')
     body
         div(class="demo-layout-transparent mdl-layout mdl-js-layout")
             header(class="mdl-layout__header mdl-layout__header--transparent")
                 div(class="mdl-layout__header-row")
-                    span(class="mdl-layout-title")= display-title
+                    span(class="mdl-layout-title")= display_title
                     div(class="mdl-layout-spacer")
                     nav(class="mdl-navigation")
                         a(class="mdl-navigation__link" href="") Link
@@ -17,7 +17,7 @@ html
                         a(class="mdl-navigation__link" href="") Link
 
             div(class="mdl-layout__drawer")
-                span(class="mdl-layout-title")= display-title
+                span(class="mdl-layout-title")= display_title
                 nav(class="mdl-navigation")
                     a(class="mdl-navigation__link" href="") Link
                     a(class="mdl-navigation__link" href="") Link
