@@ -54,12 +54,12 @@ router.get('/', function(req, res) {
 * @apiSuccess {String} date Date in ISO8061 Format, UTC time or "No school"
 * @apiSuccess {String} type Letter Day, "X" if no school
 * @apiError 400 The date query was formatted incorrectly or is an invalid range.
-* @apiSuccessExample {json} Success-Response:
+* @apiSuccessExample {json} Normal School Day
 *   {
 *       "date": "2016-02-26T13:00:00.000Z",
 *       "type": "A"
 *   }
-* @apiSuccessExample {json} Success-Response:
+* @apiSuccessExample {json} No School
 *   {
 *       "date": "No school",
 *       "type": "X"
