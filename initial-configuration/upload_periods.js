@@ -48,7 +48,3 @@ var uploadDayTypes = function(callback){
 }
 
 module.exports = uploadDayTypes;
-
-
-
-

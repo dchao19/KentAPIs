@@ -41,7 +41,8 @@ function genericContext(){
 
 router.get('/panel', function(req, res){
   // TODO return render admin-panel
-  return res.render('base', genericContext());
+  return res.redirect('/admin/days');
+  // return res.render('base', genericContext());
 });
 
 router.get('/days', function(req, res){
@@ -49,7 +50,7 @@ router.get('/days', function(req, res){
       moment() :
       moment(req.query.date);
 
-  let num_days = (typeof req.query.num_days === 'undefined') ? 12 : parseInt(num_days);
+  let num_days = (typeof req.query.num_days === 'undefined') ? 12 : parseInt(req.query.num_days);
 
   if(!date.isValid()){
     return res.json(400, {
@@ -72,7 +73,8 @@ router.get('/days', function(req, res){
       // TODO return render days
       ctx = genericContext();
       ctx.days = days;
-        return res.render('days', ctx);
+      console.log(ctx);
+      return res.render('days', ctx);
       // days: [{date, type}]
     }
   })
@@ -82,7 +84,7 @@ router.get('/days', function(req, res){
 router.get('/day', function(req, res){
   let date = (req.query.date == 'now' || typeof req.query.date == 'undefined') ?
   moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
-  moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+  moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0);
 
   if(!date.isValid()) {
       res.json(400, {
@@ -92,12 +94,12 @@ router.get('/day', function(req, res){
   }
 
   Period.find({day: date.toISOString()}).
-  select({start_time:1, end_time:1, title:1}).
-  sort({day:1}).
+  select({start_time:1, end_time:1, title:1, day:1}).
+  sort({start_time:1}).
   exec(function(err, periods){
-    if(err) return res.json(500, "Lol. Good Smert.");
+    if(err) return res.json(500, {yes: "Lol. Good Smert."});
     // TODO return render periods
-    return res.render('periods', periods);
+    return res.render('periods', {periods: periods, day: date});
     // periods: [period]
   });
 });
@@ -121,12 +123,12 @@ router.get('/period', function(req, res){
       },
       '-linked_day -_id -__v',
       function(err, period) {
-          if(err) return res.json(500, {
+          if(err || ! period) return res.json(500, {
             success: false,
             error: "Oops. I'm sorry. Alex is sorry."
           });
-          // TODO return render period
-          return res.render('period', period);
+          console.log(period);
+          return res.render('period', {period: period});
           // period: {day, start_time, end_time, title};
       });
 
@@ -154,7 +156,7 @@ router.post('/update_period', function(req, res){
 
   Period.findOneAndUpdate(
     {day: m_date},
-    {$set: {start_time: start_time}, $set: {end_time: endtime}, $set: {title: period_name}},
+    {$set: {start_time: start_time}, $set: {end_time: end_time}, $set: {title: period_name}},
     {upsert: true},
     function(err, period){
       if(err) return res.json(500, {success:false, error:"I am not good with computer"});
