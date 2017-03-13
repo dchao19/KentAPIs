@@ -23,7 +23,7 @@ req.end(function (res) {
         for(var i in day_types){
                 if(day_types.hasOwnProperty(i)){
                         var day = day_types[i];
-                        var date = moment(day.start).tz('America/Denver').hours(6).add(1, 'd').minutes(0).utc();
+                        var date = moment(day.start).tz('America/Denver').hours(6).minutes(0).utc();
                         console.log(date.toISOString());
                         req = unirest.post(serverAddress + '/schedule/day_type').type('json').send({
                                 'date': date.toISOString(),
@@ -35,7 +35,7 @@ req.end(function (res) {
                                 console.log(res.body);
                         });
 
-                }               
+                }
         }
 
 });

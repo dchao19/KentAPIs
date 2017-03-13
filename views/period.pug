@@ -4,39 +4,78 @@ block content
   .mdl-cell.mdl-cell--12-col.mdl-cell--8-col-tablet.mdl-grid
     .mdl-card.mdl-shadow--2dp.mdl-cell.mdl-cell--4-col.mdl-cell--4-col-tablet.mdl-cell--12-col-desktop
       .mdl-card__title.mdl-card--expand.mdl-color--teal-300
-        h2.mdl-card__title-text Periodo
+        h2.mdl-card__title-text Period
       .mdl-card__supporting-text.mdl-color-text--grey-600
+        a.mdl-button(href="/admin/day?date=" + dateTimeStr(period.day) + "Z") Go back
         ul.demo-list-three.mdl-list
           li.mdl-list__item.mdl-list__item--three-line
             span.mdl-list__item-primary-content
               i.material-icons.mdl-list__item-avatar schedule
-              span= esperantasPeriodo(period.title)
+              span= period.title
               //- span= period.title
               span.mdl-list__item-text-body= prettyPeriod(period)
         span.mdl-list__item-secondary-content
-          form(action="/admin/update_period", method="POST")
+          form(action="", method="POST", id="update_form")
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              label.mdl-textfield__label(for="date") dato
+              label.mdl-textfield__label(for="date") Date
               input.mdl-textfield__input(type="date", id="date", name="date")
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              label.mdl-textfield__label(for="start_time") komenca tempo
+              label.mdl-textfield__label(for="start_time") Start Time
               input.mdl-textfield__input(type="datetime", id="start_time", name="start_time")
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
               input.mdl-textfield__input(type="datetime", id="end_time", name="end_time")
-              label.mdl-textfield__label(for="end_time") fina tempo
+              label.mdl-textfield__label(for="end_time") End Time
             .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
               input.mdl-textfield__input(type="text", id="period_name", name="period_name", value=period.title)
-              label.mdl-textfield__label(for="sample3") Titolo
+              label.mdl-textfield__label(for="sample3") Title
+            input(type="text", style="display:none;", name="_id", value=period._id)
             //- label(for="period_name")
             //- input(type="text", name="period_name", value=period.title)
-            input.mdl_button(type="submit")
-          script.
-            document.getElementById('start_time').value = "#{dateTimeStr(period.start_time)}";
-            document.getElementById('end_time').value = "#{dateTimeStr(period.end_time)}";
-            document.getElementById('date').value = "#{dateStr(period.day)}";
-          //- a.mdl-list__item-secondary-action(href='/admin/period?date=' + isoDate(period.day))
-          //-   button.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--accent
-          //-     i.material-icons edit
+        button.mdl-button(id="submitter") Submit
+            //- button#submitter.mdl-button.mdl-js-button.mdl-button--raised.mdl-js-ripple-effect.mdl-button--colored.mdl-color-text--white Submit
+        script.
+          function updateQueryDate() {
+            window.history.replaceState('yay', 'yay', '?date=' + start_time_input.value + "Z");
+          }
+
+          Date.prototype.addHours = function(h) {    
+             this.setTime(this.getTime() + (h*60*60*1000)); 
+             return this;   
+          }
+
+          start_time_input = document.getElementById('start_time');
+          end_time_input = document.getElementById('end_time');
+          date_input = document.getElementById('date');
+          period_name_input = document.getElementById('period_name');
+
+          start_time_input.value = "#{dateTimeStr(addHours(period.start_time, -6))}";
+          end_time_input.value = "#{dateTimeStr(addHours(period.end_time, -6))}";
+          date_input.value = "#{dateStr(period.day)}";
+
+          document.getElementById('submitter').addEventListener('click', function(evt){
+            evt.preventDefault();
+            var d = new Date(date_input.value);
+            var datum = {period_name: period_name_input.value,
+                end_time:end_time_input.value,
+                start_time:start_time_input.value,
+                date: d.toISOString(),
+                _id: "#{period._id}"
+              };
+              console.log(datum);
+            $.post('/admin/update_period', datum, function(data){
+                var notification = document.querySelector('.mdl-js-snackbar');
+                    notification.MaterialSnackbar.showSnackbar(
+                      {
+                        message: data.success ? data.msg : data.error
+                      }
+                    );
+                    updateQueryDate();
+                });
+            return false;
+          })
+        .mdl-snackbar.mdl-js-snackbar
+          .mdl-snackbar__text
+          button.mdl-snackbar__action
     .mdl-cell--1-col
 
 block header

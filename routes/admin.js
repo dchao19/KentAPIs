@@ -19,7 +19,7 @@ var secret = config.secret;
 var passport = require('passport')
 var LocalStrategy = require('passport-local')
 
-var authUtils = require('../utils/auth.js');
+// var authUtils = require('../utils/auth.js');
 
 router.use(passport.initialize())
 
@@ -73,7 +73,6 @@ router.get('/days', function(req, res){
       // TODO return render days
       ctx = genericContext();
       ctx.days = days;
-      console.log(ctx);
       return res.render('days', ctx);
       // days: [{date, type}]
     }
@@ -105,29 +104,33 @@ router.get('/day', function(req, res){
 });
 
 router.get('/period', function(req, res){
-  let date = (req.query.date == 'now' || typeof req.query.date == 'undefined') ?
-    moment() :
-    moment(req.query.date);
-  if(!date.isValid()) {
-      res.json(400, {
-          success: false,
-          error: "Unable to parse date provided in request"
-      });
+  // let date = (req.query.date == 'now' || typeof req.query.date == 'undefined') ?
+  //   moment() :
+  //   moment(req.query.date);
+  // if(!date.isValid()) {
+  //     res.json(400, {
+  //         success: false,
+  //         error: "Unable to parse date provided in request"
+  //     });
+  // }
+  let id = req.query.id;
+  if(!id){
+    return res.json(400, {success:false, error:"NO ID"});
   }
   Period.findOne(
       {
-          $and: [
-              {start_time: {$lte: date.toISOString()}}, //Now "is a period" if the time is in between the start/end time of a period
-              {end_time: {$gte: date.toISOString()}}
-          ]
+          // $and: [
+          //     {start_time: {$lte: date.toISOString()}}, //Now "is a period" if the time is in between the start/end time of a period
+          //     {end_time: {$gte: date.toISOString()}}
+          // ]
+          _id: id
       },
-      '-linked_day -_id -__v',
+      '-linked_day -__v',
       function(err, period) {
           if(err || ! period) return res.json(500, {
             success: false,
             error: "Oops. I'm sorry. Alex is sorry."
           });
-          console.log(period);
           return res.render('period', {period: period});
           // period: {day, start_time, end_time, title};
       });
@@ -135,6 +138,39 @@ router.get('/period', function(req, res){
 });
 
 router.post('/update_period', function(req, res){
+  // Change period number, start/end time
+  // Or, if no date if found, creates a new one
+  let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
+  if(!date) return res.json(400, {success:false, error:"No date provided"});
+  let m_date = moment(date);
+  if(!m_date.isValid()) return res.json(400, {success:false, error:"Invalid date provided"});
+
+  let _id = req.body._id;
+  if(!_id) return res.json(400, {success:false, error:"You really broke it now"})
+
+  let start_time = req.body.start_time;
+  let end_time = req.body.end_time;
+  let period_name = req.body.period_name;
+  if(typeof start_time == 'undefined' || typeof end_time == 'undefined' || typeof period_name == 'undefined'){
+    return res.json(400, {success:false, error:"Missing period information"});
+  }
+  let m_start_time = moment(start_time);
+  let m_end_time = moment(end_time);
+  if(!(m_start_time.isValid() || m_end_time.isValid())){
+    return res.json(400, {success:false, error:"Invalid times provided."});
+  }
+
+  Period.findOne({_id: _id}, function(err,period){
+    if(err) return res.json(500, {success:false, error:"I am not good with computer"})
+    period.start_time = m_start_time;//.subtract(6, 'h');
+    period.end_time = m_end_time;//.subtract(6, 'h');
+    period.title = period_name;
+    period.save();
+    return res.json(200, {success:true, msg: "Period has been updated!"});
+  });
+});
+
+router.post('/new_period', function(req, res){
   // Change period number, start/end time
   // Or, if no date if found, creates a new one
   let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
@@ -154,24 +190,25 @@ router.post('/update_period', function(req, res){
     return res.json(400, {success:false, error:"Invalid times provided."});
   }
 
-  Period.findOneAndUpdate(
-    {day: m_date},
-    {$set: {start_time: start_time}, $set: {end_time: end_time}, $set: {title: period_name}},
-    {upsert: true},
-    function(err, period){
-      if(err) return res.json(500, {success:false, error:"I am not good with computer"});
-      else return res.json(200, {success:true, msg:"Updated period!"});
-    });
+  Period.create({start_time: m_start_time,
+    end_time: m_end_time,
+    day: m_date.add(12,'h'),
+    title: period_name},
+    function(err,period){
+      console.log("H" + period);
+      if(err) return res.json(500, {success:false, error:"I am not good with computer"})
+      return res.json(200, {success:true, msg: "Period has been created"});
+  });
 });
 
 router.post('/delete_period', function(req, res){
   // Delete a period
-  let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
-  if(!date) return res.json(400, {success:false, error:"No date provided"});
-  let m_date = moment(date);
-  if(!m_date.isValid()) return res.json(400, {success:false, error:"Invalid date provided"});
-  Period.findOneAndRemove({day: m_date}, function(err){
-    if(err) return res.json(500, {success:false, error:"Could not remove day"});
+  var id = req.body.id ? req.body.id : null;
+  if(!id){
+    return res.json(400, {success:false, error:"NO ID..."});
+  }
+  Period.findOneAndRemove({_id: id}, function(err){
+    if(err) return res.json(500, {success:false, error:"Could not remove period"});
     else return res.json(200, {success:true, msg: "Removed period!"});
   })
 });
@@ -199,27 +236,28 @@ router.post('/delete_day', function(req, res){
   })
 });
 
-router.post('/update_day', function(req, res){
-  // update a day's day type
-  // or, if the day is not found, make it
-  let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
-  if(!date) return res.json(400, {success:false, error:"No date provided"});
-  let m_date = moment(date);
-  if(!m_date.isValid()) return res.json(400, {success:false, error:"Invalid date provided"});
-  m_date = m_date.hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-
-  let type = (typeof req.body.day_type === 'undefined') ? false : req.body.type;
-  if(!type) return res.json(400, {sucess:false, error:"No day type provided"});
-
-  DayType.findOneAndUpdate(
-    {date: m_date},
-    {$set: {date: m_date}, $set: {type: type}},
-    {upsert: true},
-    function(err, period){
-      if(err) return res.json(500, {success:false, error:"I am not good with computer 2"});
-      else return res.json(200, {success:true, msg:"Updated period!"});
-    });
-});
+// FIXME
+// router.post('/update_day', function(req, res){
+//   // update a day's day type
+//   // or, if the day is not found, make it
+//   let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
+//   if(!date) return res.json(400, {success:false, error:"No date provided"});
+//   let m_date = moment(date);
+//   if(!m_date.isValid()) return res.json(400, {success:false, error:"Invalid date provided"});
+//   m_date = m_date.hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+//
+//   let type = (typeof req.body.day_type === 'undefined') ? false : req.body.type;
+//   if(!type) return res.json(400, {sucess:false, error:"No day type provided"});
+//
+//   DayType.findOneAndUpdate(
+//     {date: m_date},
+//     {$set: {date: m_date}, $set: {type: type}},
+//     {upsert: true},
+//     function(err, period){
+//       if(err) return res.json(500, {success:false, error:"I am not good with computer 2"});
+//       else return res.json(200, {success:true, msg:"Updated period!"});
+//     });
+// });
 
 // router.post('/admin/move_day', function(req, res){
 //   // move's a day and all associated periods

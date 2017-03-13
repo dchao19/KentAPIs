@@ -4,21 +4,117 @@ block content
   .mdl-cell.mdl-cell--12-col.mdl-cell--8-col-tablet.mdl-grid
     .mdl-card.mdl-shadow--2dp.mdl-cell.mdl-cell--4-col.mdl-cell--4-col-tablet.mdl-cell--12-col-desktop
       .mdl-card__title.mdl-card--expand.mdl-color--teal-300
-        h2.mdl-card__title-text Periodoj
+        h2.mdl-card__title-text Periods
       .mdl-card__supporting-text.mdl-color-text--grey-600
+        button#new-period.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--accent New Period
+          i.material-icons alarm_add
         ul.demo-list-three.mdl-list
           each period in periods
-            li.mdl-list__item.mdl-list__item--three-line
+            li.mdl-list__item.mdl-list__item--three-line(id="list-"+period._id)
               span.mdl-list__item-primary-content
                 i.material-icons.mdl-list__item-avatar schedule
-                span= esperantasPeriodo(period.title)
+                span= period.title
                 //- span= period.title
                 span.mdl-list__item-text-body= prettyPeriod(period)
               span.mdl-list__item-secondary-content
-                a.mdl-list__item-secondary-action(href='/admin/period?date=' + isoDate(period.start_time))
+                a.mdl-list__item-secondary-action(href='/admin/period?id=' + period._id)
                   button.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--accent
                     i.material-icons edit
+              span.mdl-list__item-secondary-content
+                button.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--accent(onclick="deletePeriod('" + period._id + "')", id='delete-' + period._id)
+                  i.material-icons delete
     .mdl-cell--1-col
+    dialog#dialog1.mdl-dialog
+      h4.mdl-dialog__title Delete day?
+      .mdl-dialog__content
+        p You should delete this day
+      .mdl-dialog__actions
+        button#actually-delete.mdl-button DELETE IT
+        button.mdl-button.close Hell nah
+    dialog#dialog2.mdl-dialog
+      h4.mdl-dialog__title Create a New Period
+      .mdl-dialog__content
+        form(action="", method="POST", id="update_form")
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+            label.mdl-textfield__label(for="date") Date
+            input.mdl-textfield__input(type="date", id="date", name="date")
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+            label.mdl-textfield__label(for="start_time") Start Time
+            input.mdl-textfield__input(type="datetime", id="start_time", name="start_time")
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+            input.mdl-textfield__input(type="datetime", id="end_time", name="end_time")
+            label.mdl-textfield__label(for="end_time") End Time
+          .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+            input.mdl-textfield__input(type="text", id="period_name", name="period_name", value="")
+            label.mdl-textfield__label(for="sample3") Title
+      .mdl-dialog__actions
+        button.mdl-button.create Create Period
+        button.mdl-button.close Nevermind
+    .mdl-snackbar.mdl-js-snackbar
+      .mdl-snackbar__text
+      button.mdl-snackbar__action
+    script.
+      var dialog = document.querySelector('#dialog1');
+      deletingId = "";
+      var notification = document.querySelector('.mdl-js-snackbar');
+      function deletePeriod(evt){
+        console.log("YAY!");
+        console.log(evt);
+        deletingId = evt;
+        dialog.showModal();
+      }
+
+      dialog.querySelector('.close').addEventListener('click', function() {
+        dialog.close();
+      });
+
+      dialog.querySelector('#actually-delete').addEventListener('click', function(){
+        dialog.close();
+        var datum = {
+            id: deletingId
+          };
+        $.post('/admin/delete_period', datum, function(data){
+          notification.MaterialSnackbar.showSnackbar(
+            {
+              message: data.success ? data.msg : data.error
+            }
+          );
+          if(data.success){
+            var list_entry = document.getElementById('list-' + deletingId);
+            if(list_entry){
+              list_entry.parentNode.removeChild(list_entry);
+            }
+          }
+        });
+      });
+      var dialog2 = document.querySelector('#dialog2');
+      document.getElementById('new-period').addEventListener('click', function(){
+        dialog2.showModal();
+        dialog2.querySelector('#date').value = "#{dateStr(periods[0].day)}";
+        dialog2.querySelector('#start_time').value = "#{dateTimeStr(periods[0].start_time)}";
+        dialog2.querySelector('#end_time').value = "#{dateTimeStr(periods[0].end_time)}";
+      });
+
+      dialog2.querySelector('.close').addEventListener('click', function(){
+        dialog2.close();
+      })
+      dialog2.querySelector('.create').addEventListener('click', function(){
+        var d = new Date(dialog2.querySelector('#date').value);
+        var datum = {period_name: dialog2.querySelector('#period_name').value,
+            end_time:dialog2.querySelector('#end_time').value,
+            start_time: dialog2.querySelector('#start_time').value,
+            date: d.toISOString()
+          };
+        $.post('/admin/new_period', datum, function(data){
+        var notification = document.querySelector('.mdl-js-snackbar');
+            notification.MaterialSnackbar.showSnackbar(
+              {
+                message: data.success ? data.msg : data.error
+              }
+            );
+            dialog2.close();
+        });
+      })
 
 block header
   span.mdl-layout-title= prettyDate(periods[0].day)

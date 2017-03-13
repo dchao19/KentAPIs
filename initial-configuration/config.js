@@ -1,10 +1,10 @@
 var config = {}
 
-config.serverAddress = "<your server address here>";
+config.serverAddress = "http://localhost:8080";
 
 config.credentials = {
-    "username": "<your username here>",
-    "password": "<your password here>"
+    "username": "alex",
+    "password": "awesome"
 }
 
 module.exports = config
