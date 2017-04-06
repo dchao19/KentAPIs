@@ -50,7 +50,7 @@ router.get('/', function(req, res) {
 * @apiParam {String} date=now an ISO 8061 date string
 * @apiSuccess {String} date Date in ISO8061 Format, UTC time
 * @apiSuccess {String} type Letter Day
-* @apiError 400 The date query was formatted incorrectly or is an invalid range. 
+* @apiError 400 The date query was formatted incorrectly or is an invalid range.
 * @apiSuccessExample {json} Success-Response:
 *   {
 *       "date": "2016-02-26T13:00:00.000Z",
@@ -59,14 +59,14 @@ router.get('/', function(req, res) {
 * @apiErrorExample {json} Error-Response:
 *   HTTP/1.1 400 Bad Request
 *   {
-*       "error": "Invalid date format"    
+*       "error": "Invalid date format"
 *   }
 */
 router.get('/day_type', function(req, res, next) {
         var date;
-        if(req.query.date == "now" || req.query.date == undefined) 
+        if(req.query.date == "now" || req.query.date == undefined)
                 date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-        else { 
+        else {
                 date = moment(req.query.date)
                 var tempDate = moment(req.query.date)
                 date.tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0);
@@ -94,34 +94,34 @@ router.get('/day_type', function(req, res, next) {
 * @apiSuccess {String} periods.start_time Start time of period in UTC timezone
 * @apiSuccess {String} periods.end_time End time of period in UTC timezone
 * @apiSuccess {String} periods.day The period's associated day
-* @apiError 400 The date query was formatted incorrectly or is an invalid range. 
+* @apiError 400 The date query was formatted incorrectly or is an invalid range.
 * @apiSuccessExample {json} Success-Response:
 *   [
 *       {
 *           "title": "Period 1",
 *           "start_time" : "",
 *           "end_time": "",
-*           "day": ""        
+*           "day": ""
 *       },
 *       {
 *           "title": "Period 3",
 *           "start_time" : "",
 *           "end_time": "",
-*           "day": ""        
+*           "day": ""
 *       }
-*       ... 
+*       ...
 *   ]
 * @apiErrorExample {json} Error-Response:
 *   HTTP/1.1 400 Bad Request
 *   {
-*       "error": "Invalid date format"    
+*       "error": "Invalid date format"
 *   }
 */
 router.get('/all_periods', function(req, res) {
         var date;
-        if(req.query.date == "now" || req.query.date == undefined) 
+        if(req.query.date == "now" || req.query.date == undefined)
                 date = moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-        else { 
+        else {
                 date = moment(req.query.date)
                 var tempDate = moment(req.query.date)
                 date.tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0);
@@ -141,8 +141,8 @@ router.get('/all_periods', function(req, res) {
                 for(var i in result) {
                         period = result[i];
                         pretty_result.push({
-                                title:period.title, 
-                                start_time:period.start_time, 
+                                title:period.title,
+                                start_time:period.start_time,
                                 end_time:period.end_time,
                                 day:period.day
                         });
@@ -175,9 +175,9 @@ router.get('/all_periods', function(req, res) {
 */
 router.get('/period', function(req, res) {
         var date;
-        if(req.query.date == "now") 
+        if(req.query.date == "now")
                 date = new Date();
-        else 
+        else
                 date = new Date(req.query.date);
         if(date == "Invalid Date") {
                 res.status('400').send({
@@ -186,7 +186,7 @@ router.get('/period', function(req, res) {
         }
         Period.findOne({
                 $and:[
-                {start_time:{$lte:date.toISOString()}}, 
+                {start_time:{$lte:date.toISOString()}},
                 {end_time:{$gte:date.toISOString()}}
                 ]}, function(error, result) {
                         if(error) res.status('400').send({
@@ -194,8 +194,8 @@ router.get('/period', function(req, res) {
                         });
                         period = result;
                         pretty_result = {
-                                title:period.title, 
-                                start_time:period.start_time, 
+                                title:period.title,
+                                start_time:period.start_time,
                                 end_time:period.end_time,
                                 day:period.day
                         }
@@ -244,7 +244,7 @@ router.post('/register', function(req, res) {
 * @apiSuccessExample {json} Success-Response:
 *   {
 *       "message": "Here is your token",
-*       "token": "<USER_TOKEN>" 
+*       "token": "<USER_TOKEN>"
 *   }
 */
 router.post('/get-token', function(req, res) {
@@ -306,11 +306,11 @@ router.post('/period', function(req,res){
                         Period.create(poster, function(err, post){
                                 if(err) res.json("error");
                                 res.json(post);
-                        });   
+                        });
                 });
         } else {
                 res.json(401, {"message": "You do not have permission to perform that action"});
-        }                       
+        }
 });
 
 router.post('/day_type', function(req,res){
@@ -327,7 +327,7 @@ router.post('/day_type', function(req,res){
                 });
         } else {
                 res.json(401, {"message": "You do not have permission to perform that action"});
-        }                       
+        }
 });
 
 router.get('/auth-test', function(req, res) {
