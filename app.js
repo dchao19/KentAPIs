@@ -12,20 +12,24 @@ var config = require('./config.js');
 //Set-up database
 var mongoose = require('mongoose');
 mongoose.connect(config.database, function(err) {
-    if (err) {
-        console.log('Database connection error', err);
-    } else {
-        console.log('Database connection successful');
-    }
+        if (err) {
+                console.log('Database connection error', err);
+        } else {
+                console.log('Database connection successful');
+        }
 });
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
 app.use(bodyParser.urlencoded({
-    extended: true
+        extended: true
 }));
 app.use(bodyParser.json());
 
+app.use(function(req, res, next) {
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+});
 
 // ROUTES FOR OUR API
 // =============================================================================
@@ -33,9 +37,9 @@ var router = require('./routes/schedule.js'); // get an instance of the express 
 var router2 = express.Router();
 
 router2.get('/', function(req, res) {
-    res.json({
-        message: "API v2 OK"
-    });
+        res.json({
+                message: "API v2 OK"
+        });
 });
 
 

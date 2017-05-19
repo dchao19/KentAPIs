@@ -192,6 +192,7 @@ router.get('/period', function(req, res) {
                         if(error) res.status('400').send({
                                 error: "Invalid query"
                         });
+                        if(result) {
                         period = result;
                         pretty_result = {
                                 title:period.title, 
@@ -200,6 +201,9 @@ router.get('/period', function(req, res) {
                                 day:period.day
                         }
                         res.json(200, pretty_result);
+                        } else {
+                            return res.status(200).json({});
+                        }
                 });
 
 });
