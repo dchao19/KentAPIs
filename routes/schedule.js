@@ -86,7 +86,7 @@ router.get('/day_type', function(req, res, next) {
         if (day) {
             return res.send({
                 date: day.date,
-                type: date.type
+                type: day.type
             });
         }
         
