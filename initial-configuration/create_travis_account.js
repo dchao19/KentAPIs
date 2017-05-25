@@ -21,6 +21,6 @@ var createPromoted = function(callback){
             }
         });
     });
-}
+};
 
 module.exports = createPromoted;

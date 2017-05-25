@@ -32,6 +32,7 @@ passport.deserializeUser(Account.deserializeUser());
  */
 
 function updatePeriodList() {
+    console.log('Updating periods');
     Period.distinct('title', {}, function(err, titleList) {
         periodTitleList = titleList;
     });
@@ -89,7 +90,7 @@ router.get('/day_type', function(req, res, next) {
         });
     }
 
-    DayType.findOne({date: date.toISOString()}, function(err, day) {
+    DayType.findOne({date: date.toISOString()}, '-_id -__v', function(err, day) {
         if(err) {
             return res.status(500).send({
                 success: false,
@@ -98,10 +99,7 @@ router.get('/day_type', function(req, res, next) {
         }
 
         if (day) {
-            return res.send({
-                date: day.date,
-                type: day.type
-            });
+            return res.send(day);
         }
 
         return res.send({

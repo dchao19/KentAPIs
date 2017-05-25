@@ -1,7 +1,7 @@
-var ical = require('ical')
-var unirest = require('unirest')
+var ical = require('ical');
+var unirest = require('unirest');
 var moment = require('moment');
-var timezone = require('moment-timezone')
+var timezone = require('moment-timezone');
 var config = process.env.NODE_ENV === 'testing' ? require('./travis_upload_config.js') : require('./config.js');
 var async = require('async');
 

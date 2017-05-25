@@ -45,6 +45,6 @@ var uploadDayTypes = function(callback){
                         callback();
                 });
         });
-}
+};
 
 module.exports = uploadDayTypes;

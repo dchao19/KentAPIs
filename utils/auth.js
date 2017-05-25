@@ -3,7 +3,7 @@ var config = require('../config.js');
 var secret = config.secret;
 
 var nonStrictAuthentication = function(req,res,next){
-	var token = req.body.token || req.query.token || req.headers['x-access-token']
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
     if(token) {
         jwt.verify(token, secret, function(err, decoded) {
             if(!err) {
@@ -17,7 +17,7 @@ var nonStrictAuthentication = function(req,res,next){
 };
 
 var strictAuthentication = function(req,res,next){
-	var token = req.body.token || req.query.token || req.headers['x-access-token']
+	var token = req.body.token || req.query.token || req.headers['x-access-token'];
     if(token) {
         jwt.verify(token, secret, function(err, decoded) {
             if(!err) {
@@ -35,4 +35,4 @@ var strictAuthentication = function(req,res,next){
 module.exports = {
 	nonStrictAuthentication: nonStrictAuthentication,
 	strictAuthentication: strictAuthentication
-}
+};

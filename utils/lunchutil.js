@@ -15,7 +15,7 @@ var getPictureName = function(numericalDOW, lunchSource, callback){
 		}
 		else lunchSource.replace("data-objid=", "notneeded=");
 	}
-}
+};
 
 var forceUpdate = () => {
 	return new Promise((resolve, reject) => {
@@ -33,7 +33,7 @@ var forceUpdate = () => {
 			reject(err);
 		})
 	});
-}
+};
 
 var downloadImage = (url, fileName) => {
 	return new Promise((resolve, reject) => {
@@ -56,7 +56,7 @@ var downloadImage = (url, fileName) => {
 			});
 		})
 	});
-}
+};
 
 var createFolders = (folders) => {
 	return new Promise((resolve, reject) => {
@@ -70,7 +70,7 @@ var createFolders = (folders) => {
 			return resolve();
 		});
 	});
-}
+};
 
 module.exports = {
 	getPictureName: getPictureName,

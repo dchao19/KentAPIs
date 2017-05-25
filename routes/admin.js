@@ -1,27 +1,27 @@
-var express = require('express')
+var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose')
-var jwt = require('jsonwebtoken')
-var moment = require('moment')
-var timezone = require('moment-timezone')
+var mongoose = require('mongoose');
+var jwt = require('jsonwebtoken');
+var moment = require('moment');
+var timezone = require('moment-timezone');
 var async = require('async');
 
-var Models = require('../models/ScheduleModels.js')
+var Models = require('../models/ScheduleModels.js');
 var Account = require('../models/Account.js');
 
-var Period = Models.Period
-var Day = Models.Day
-var DayType = Models.DayType
+var Period = Models.Period;
+var Day = Models.Day;
+var DayType = Models.DayType;
 
 var config = require('../config.js');
 var secret = config.secret;
 
-var passport = require('passport')
-var LocalStrategy = require('passport-local')
+var passport = require('passport');
+var LocalStrategy = require('passport-local');
 
 var authUtils = require('../utils/auth.js');
 
-router.use(passport.initialize())
+router.use(passport.initialize());
 
 passport.use(new LocalStrategy(Account.authenticate()));
 passport.serializeUser(Account.serializeUser());

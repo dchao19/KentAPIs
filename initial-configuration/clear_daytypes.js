@@ -1,15 +1,15 @@
-var mongoose = require('mongoose')
-var moment = require('moment')
-var timezone = require('moment-timezone')
-var config = require('../config.js')
+var mongoose = require('mongoose');
+var moment = require('moment');
+var timezone = require('moment-timezone');
+var config = require('../config.js');
 
 
-var Models = require('../models/ScheduleModels.js')
+var Models = require('../models/ScheduleModels.js');
 var Account = require('../models/Account.js');
 
-var Period = Models.Period
-var Day = Models.Day
-var DayType = Models.DayType
+var Period = Models.Period;
+var Day = Models.Day;
+var DayType = Models.DayType;
 
 mongoose.connect(config.database, function(err) {
         if (err) {
