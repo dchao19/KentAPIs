@@ -6,6 +6,6 @@ module.exports = {
     //currently using 64 bits for testing, likely want to go to at least 256, also need to conceal in production
     'secret': '<FILL_IN_YOUR_SECRET>',
     'database': databaseUrl,
-    'google_api_key': 'AIzaSyBT6A97FzdqCw9YwciwmKHzbpwgG9S6BpI',//'<FILL_IN_YOUR_KEY>',
+    'google_api_key': '<FILL_IN_YOUR_KEY>',
     port: 8080
 };
