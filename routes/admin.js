@@ -19,8 +19,6 @@ var secret = config.secret;
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
 
-var authUtils = require('../utils/auth.js');
-
 router.use(passport.initialize());
 
 passport.use(new LocalStrategy(Account.authenticate()));

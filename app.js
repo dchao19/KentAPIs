@@ -10,6 +10,7 @@ var config = require('./config.js');
 
 //Set-up database
 var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
 mongoose.connect(config.database, function(err) {
     if (err) {
         console.log('Database connection error', err);
@@ -38,27 +39,5 @@ app.use('/schedule', router);
 app.use('/lunch', lunch);
 app.use('/admin', admin);
 
-//Schedule the download of lunch data
-var scheduleUtils = require('./utils/scheduleLunchDownload.js');
-scheduleUtils.schedule('0 0 6 * * *', () => {
-    scheduleUtils.download()
-    .then((data) => {
-        scheduleUtils.cache(data, `lunchdata/lunchdata.txt`)
-        .catch((error) => {
-            console.error('Error saving the lunch data to file.');
-        })
-    })
-    .catch((error) => {
-        console.error('Error downloading lunch data.');
-    })
-});
-
-//create folders for lunch data
-
-var lunchUtils = require('./utils/lunchutil.js');
-lunchUtils.createFolders([
-    'lunchdata',
-    'lunchdata/menus'
-]);
 
 module.exports = app;
