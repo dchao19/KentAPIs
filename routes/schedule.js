@@ -340,7 +340,7 @@ router.post('/register', function(req, res) {
     });
 });
 /**
- * @api {post} schedule/get-token GetToken
+ * @api {post} schedule/get_token GetToken
  * @apiName "Get Token"
  * @apiDescription This endpoint returns a user's token after authentication.
  * @apiGroup Schedule
@@ -355,7 +355,7 @@ router.post('/register', function(req, res) {
  *       "token": "<USER_TOKEN>"
  *   }
  */
-router.post('/get-token', function(req, res) {
+router.post('/get_token', function(req, res) {
     Account.findOne({username:req.body.username}, function(err, account) {
         if(err) {
             res.json(400, {error: 'User not found'});
