@@ -34,8 +34,8 @@ passport.deserializeUser(Account.deserializeUser());
 function genericContext(){
   return {
     static_path: '/static',
-    display_title: 'ER MAH GERD',
-    title: 'yup, so pro'
+    display_title: 'Admin Panel',
+    title: 'Admin Panel'
   };
 }
 
@@ -104,15 +104,6 @@ router.get('/day', function(req, res){
 });
 
 router.get('/period', function(req, res){
-  // let date = (req.query.date == 'now' || typeof req.query.date == 'undefined') ?
-  //   moment() :
-  //   moment(req.query.date);
-  // if(!date.isValid()) {
-  //     res.json(400, {
-  //         success: false,
-  //         error: "Unable to parse date provided in request"
-  //     });
-  // }
   let id = req.query.id;
   if(!id){
     return res.json(400, {success:false, error:"NO ID"});
