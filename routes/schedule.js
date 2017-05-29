@@ -292,7 +292,7 @@ router.get('/next_occurrence', function(req, res) {
                 success: false,
                 error: "Internal server error"
             });
-            res.json(200, periods);
+            res.json(periods);
         });
     }
     if(type === 'day_type') {
@@ -306,7 +306,7 @@ router.get('/next_occurrence', function(req, res) {
                 success: false,
                 error: "Internal server error"
             });
-            res.json(200, days);
+            res.json(days);
         });
     }
 
