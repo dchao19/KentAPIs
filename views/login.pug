@@ -1,0 +1,24 @@
+extends base
+
+block content
+    .mdl-cell.mdl-cell--12-col.mdl-cell--8-col-tablet.mdl-grid.mdl-grid--no-spacing
+    .mdl-card.mdl-shadow--2dp.mdl-cell.mdl-cell--4-col.mdl-cell--4-col-tablet.mdl-cell--12-col-desktop
+        .mdl-card__title.mdl-card--expand.mdl-color--teal-300
+            h2.mdl-card__title-text Kent API Admin
+        div.mdl-card__supporting-text.center
+            form#login_form(action="/admin/login" method="POST")
+                if error_message
+                    div#login-error= error_message
+                div.mdl-textfield.mdl-js-textfield
+                    input.mdl-textfield__input(type="text" id="username" name="username")
+                    label.mdl-textfield__label(for="username") Username
+                br
+                div.mdl-textfield.mdl-js-textfield
+                    input.mdl-textfield__input(type="password" id="userpass" name="password")
+                    label.mdl-textfield__label(for="userpass") Password
+
+        div.mdl-card__actions.mdl-card--border.right
+            button#login.mdl-button.mdl-button--colored.mdl-js-button.mdl-js-ripple-effect Log in
+
+block header
+    span.mdl-layout-title= "Login"

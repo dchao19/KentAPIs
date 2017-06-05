@@ -1,0 +1,17 @@
+.mdl-navigation__link {
+    font-size: 20px;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+}
+
+.right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+#login-error {
+    color: red;
+}

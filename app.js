@@ -32,7 +32,7 @@ app.use('/static', express.static('static'));
 // =============================================================================
 var router = require('./routes/schedule.js'); // get an instance of the express Router
 var lunch = require('./routes/lunch.js');
-var admin = require('./routes/admin.js');
+var admin = require('./routes/admin.js')(mongoose.connection);
 
 // REGISTER OUR ROUTES -------------------------------
 app.use('/schedule', router);

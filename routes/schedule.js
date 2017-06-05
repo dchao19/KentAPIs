@@ -61,7 +61,7 @@ router.get('/', function(req, res) {
 /**
  * @api {get} schedule/day_type Day Type (Letterday)
  * @apiName "DayType"
- * @apiDescription This endpoint returns the letter day of a given date, or now if none specified.
+ * @apiDescription This endpoint returns the letter day of a given date, or now if none specified. The day_type will be an X if there is no school
  * @apiGroup Schedule
  * @apiParam {String} date=now an ISO 8061 date string
  * @apiSuccess {String} date Date in ISO8061 Format, UTC time
@@ -103,7 +103,7 @@ router.get('/day_type', function(req, res, next) {
         }
 
         return res.send({
-            date: "No school",
+            date: date,
             type: "X"
         });
     });
