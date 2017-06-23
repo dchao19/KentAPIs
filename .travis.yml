@@ -3,7 +3,9 @@ node_js:
     - node
 services:
   - mongodb
+before_install:
+  - export TZ=America/Denver
 env:
-    - NODE_ENV=testing
+  - NODE_ENV=testing
 before_script:
-    - npm run initial-config
+  - npm run initial-config

@@ -23,9 +23,8 @@ const uploadDayTypes = function (callback) {
     req.end(function (res) {
         if (res.error) throw new Error(res.error);
         let token = res.body.token;
-        async.each(us_all_periods, function (event, done) {
+        async.eachSeries(us_all_periods, function (event, done) {
             let date = moment(event.start).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-            console.log(date);
             let req = unirest.post(serverAddress + '/schedule/period').type('json').send({
                 'day': date.toISOString(), //standardized at 7:00 AM (MDT) the day of the period
                 'start_time': event.start.toISOString(), //match db schema
@@ -47,7 +46,7 @@ const uploadDayTypes = function (callback) {
             });
         }, function (err) {
             if(err) throw err;
-            async.each(ms_all_periods, function (event, done) {
+            async.eachSeries(ms_all_periods, function (event, done) {
                 let date = moment(event.start).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
                 let req = unirest.post(serverAddress + '/schedule/period').type('json').send({
                     'day': date.toISOString(), //standardized at 7:00 AM (MDT) the day of the period
