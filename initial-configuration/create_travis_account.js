@@ -1,10 +1,10 @@
-var unirest = require('unirest');
-var config = process.env.NODE_ENV === 'testing' ? require('./travis_upload_config.js') : require('./config.js');
-var serverAddress = config.serverAddress;
-var Account = require('../models/Account');
+const unirest = require('unirest');
+const config = process.env.NODE_ENV === 'testing' ? require('./travis_upload_config.js') : require('./config.js');
+const serverAddress = config.serverAddress;
+const Account = require('../models/Account');
 
-var createPromoted = function(callback){
-    var req = unirest.post(serverAddress + '/schedule/register');
+const createPromoted = function(callback){
+    let req = unirest.post(serverAddress + '/schedule/register');
     req.headers({
         'Content-Type': 'application/x-www-form-urlencoded'
     });

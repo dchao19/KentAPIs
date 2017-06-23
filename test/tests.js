@@ -20,6 +20,7 @@ describe('Start server', function() {
         });
 });
 
+
 describe('Api status', function() {
         it('should respond to get', function() {
                 unirest.get('http://localhost:' + port + '/schedule').end(function(res) {
@@ -33,14 +34,15 @@ describe('Api status', function() {
         });
 });
 
+
 describe('Periods agree with letter days', function() {
         let count = 0;
         it('checks all dates', function(done) {
-                dates.forEach(function(date, index) {
+                dates.forEach(function(date) {
                         getDay(date, function(currentDay) {
                                 count++;
                                 if(currentDay !== "No school") {
-                                        if(currentDay.length == 0) {
+                                        if(currentDay.length === 0) {
                                             console.log(date);
                                         }
                                         expect(currentDay).to.not.be.undefined;
@@ -96,7 +98,6 @@ function getNext(type, identifier, date, maxResults, cb) {
 function getDay(date, cb) {
         unirest.get(`http://localhost:${port}/schedule/day_type?date=${date.format("YYYY-MM-DD")}`).end(function(res) {
                 if(res.body.type !== 'X') {
-                        let dayType = res.body.type;
                         unirest.get(`http://localhost:${port}/schedule/all_periods?date=${date.format("YYYY-MM-DD")}`).end(function(res2) {
                                 cb(res2.body);
                         });

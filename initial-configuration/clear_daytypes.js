@@ -1,15 +1,14 @@
-var mongoose = require('mongoose');
-var moment = require('moment');
-var timezone = require('moment-timezone');
-var config = require('../config.js');
+const mongoose = require('mongoose');
+const moment = require('moment');
+const timezone = require('moment-timezone');
+const config = require('../config.js');
 
 
-var Models = require('../models/ScheduleModels.js');
-var Account = require('../models/Account.js');
+const Models = require('../models/ScheduleModels.js');
+const Account = require('../models/Account.js');
 
-var Period = Models.Period;
-var Day = Models.Day;
-var DayType = Models.DayType;
+const Period = Models.Period;
+const DayType = Models.DayType;
 
 mongoose.connect(config.database, function(err) {
         if (err) {
@@ -20,11 +19,11 @@ mongoose.connect(config.database, function(err) {
 });
 
 
-var startDate = moment(new Date("2016-08-23 12:00:00.000Z"));
+let startDate = moment(new Date("2016-08-23 12:00:00.000Z"));
 
-var endDate = moment(new Date("2017-05-25 12:00:00.000Z"));
+let endDate = moment(new Date("2017-05-25 12:00:00.000Z"));
 
-var curDate = moment(startDate);
+let curDate = moment(startDate);
 
 while(moment(curDate).isSameOrBefore(endDate)) {
         curDate.add(1, 'd');

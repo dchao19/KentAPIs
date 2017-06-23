@@ -1,25 +1,24 @@
-var express = require('express');
-var router = express.Router();
-var mongoose = require('mongoose');
+const express = require('express');
+const router = express.Router();
+const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-var jwt = require('jsonwebtoken');
-var moment = require('moment');
-var timezone = require('moment-timezone');
+const jwt = require('jsonwebtoken');
+const moment = require('moment');
+const timezone = require('moment-timezone');
 
-var Models = require('../models/ScheduleModels.js');
-var Account = require('../models/Account.js');
+const Models = require('../models/ScheduleModels.js');
+const Account = require('../models/Account.js');
 
-var Period = Models.Period;
-var Day = Models.Day;
-var DayType = Models.DayType;
+const Period = Models.Period;
+const DayType = Models.DayType;
 
-var config = require('../config.js');
-var secret = config.secret;
+const config = require('../config.js');
+const secret = config.secret;
 
-var passport = require('passport');
-var LocalStrategy = require('passport-local');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
 
-var periodTitleList = [];
+let periodTitleList = [];
 
 router.use(passport.initialize());
 
@@ -48,9 +47,12 @@ setInterval(updatePeriodList, 20*60*1000);
  * @api {get} schedule/ API Status
  * @apiName APIStatus
  * @apiGroup Schedule
+ * @apiVersion 1.0.0
  * @apiSuccess {String} message API OK
  * @apiSuccessExample Success-Response:
- *   API OK
+ *   {
+ *      "message": "API OK"
+ *   }
  */
 
 router.get('/', function(req, res) {
@@ -63,6 +65,7 @@ router.get('/', function(req, res) {
  * @apiName "DayType"
  * @apiDescription This endpoint returns the letter day of a given date, or now if none specified. The day_type will be an X if there is no school
  * @apiGroup Schedule
+ * @apiVersion 1.0.0
  * @apiParam {String} date=now an ISO 8061 date string
  * @apiSuccess {String} date Date in ISO8061 Format, UTC time
  * @apiSuccess {String} type Letter Day
@@ -78,10 +81,10 @@ router.get('/', function(req, res) {
  *       "error": "Invalid date format"    
  *   }
  */
-router.get('/day_type', function(req, res, next) {
-    var date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
-        moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
-        moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+router.get('/day_type', function(req, res) {
+    let  date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
+        moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
+        moment(req.query.date).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
 
     if(!date.isValid()) {
         return res.status(400).send({
@@ -89,7 +92,6 @@ router.get('/day_type', function(req, res, next) {
             error: "Unable to parse date provided in request"
         });
     }
-
     DayType.findOne({date: date.toISOString()}, '-_id -__v', function(err, day) {
         if(err) {
             return res.status(500).send({
@@ -110,10 +112,12 @@ router.get('/day_type', function(req, res, next) {
 
 });
 /**
- * @api {get} schedule/all_periods All Periods
+ * @api {get} schedule/:school/all_periods All Periods
  * @apiName "All_Periods"
  * @apiDescription This endpoint returns an array of all of the periods in a date, or today if none is specified.
  * @apiGroup Schedule
+ * @apiVersion 1.0.0
+ * @apiParam {String="US","MS"} school="US" School calendar to use
  * @apiParam {String} date=now an ISO 8061 date string
  * @apiSuccess {Object[]} periods List of periods in a day.
  * @apiSuccess {String} periods.title Day Type
@@ -143,18 +147,19 @@ router.get('/day_type', function(req, res, next) {
  *       "error": "Invalid date format"
  *   }
  */
-router.get('/all_periods', function(req, res) {
-    var date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
-        moment().hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
-        moment(req.query.date).hours(6).minutes(0).seconds(0).milliseconds(0).utc();
-
+router.get('/:school/all_periods', function(req, res) {
+    let  date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
+        moment().tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc() :
+        moment(req.query.date).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+    let school = req.params.school ? req.params.school : "US";
+    school = school.toUpperCase();
     if(!date.isValid()) {
         return res.status(400).send({
             success: false,
             error: "Unable to parse date provided in request"
         });
     }
-    Period.find({day: date.toISOString()},'-linked_day -_id -__v', function(error, periods) {
+    Period.find({day: date.toISOString(), school:school},'-linked_day -_id -__v', function(error, periods) {
         if (error) res.status(500).send({
             success: false,
             error: "Internal server error"
@@ -162,15 +167,17 @@ router.get('/all_periods', function(req, res) {
         periods.sort(function (a, b) {
             return (new Date(a.start_time)).getTime() - (new Date(b.start_time)).getTime();
         });
-        res.json(200, periods);
+        res.json(periods);
     });
 
 });
 /**
- * @api {get} schedule/period Period
+ * @api {get} schedule/:school/period Period
  * @apiName "Period"
  * @apiDescription This endpoint returns the current period if no date is specified, or the period at the specified date and time. If no period exists, an empty object will be returned.
  * @apiGroup Schedule
+ * @apiVersion 1.0.0
+ * @apiParam {String="US","MS"} school="US" School calendar to use
  * @apiParam {String} date=now an ISO 8061 date string
  * @apiSuccess {String} title Day Type
  * @apiSuccess {String} start_time Start time of period in UTC timezone
@@ -185,11 +192,12 @@ router.get('/all_periods', function(req, res) {
  *       "title": "Period 1",
  *   }
  */
-router.get('/period', function(req, res) {
-    var date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
-        moment() :
-        moment(req.query.date);
-
+router.get('/:school/period', function(req, res) {
+    let  date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
+        moment().tz('America/Denver') :
+        moment(req.query.date).tz('America/Denver');
+    let school = req.params.school ? req.params.school : "US";
+    school = school.toUpperCase();
     if(!date.isValid()) {
         return res.status(400).send({
             success: false,
@@ -198,6 +206,7 @@ router.get('/period', function(req, res) {
     }
     Period.findOne(
         {
+            school: school,
             $and:[
                 {start_time:{$lte:date.toISOString()}}, //Now "is a period" if the time is in between the start/end time of a period
                 {end_time:{$gte:date.toISOString()}}
@@ -210,17 +219,19 @@ router.get('/period', function(req, res) {
                 error: "Internal server error"
             });
             if(period) {
-                res.json(200, period);
+                res.json(period);
             } else {
                 return res.status(200).json({});
             }
         });
 });
 /**
- * @api {get} schedule/next_occurrence Next Occurance
+ * @api {get} schedule/:school/next_occurrence Next Occurence
  * @apiName "Next Occurrence"
  * @apiDescription This endpoint returns the next occurrence(s) of a specified day type or period (not including the current occurrence, if applicable).
  * @apiGroup Schedule
+ * @apiVersion 1.0.0
+ * @apiParam {String="US","MS"} school="US" School calendar to use
  * @apiParam (Required) {String="day_type","period"} type A string specifying the type of requested resource
  * @apiParam (Required) {String} identifier A string specifying the type of requested resource e.g "A", "Period 1", "Advisory Office Hours"
  * @apiParam  {Number} maxResults=1 the maximum number of future occurrences to be returned
@@ -265,27 +276,30 @@ router.get('/period', function(req, res) {
  *       ...
  *   ]
  */
-router.get('/next_occurrence', function(req, res) {
-    var type = req.query.type;
-    var identifier = req.query.identifier;
-    var validType = type && (type === 'day_type' || type === 'period');
-    var validIdentifier = identifier && (identifier >= "A" && identifier <= "G" || periodTitleList.includes(identifier));
+router.get('/:school/next_occurrence', function(req, res) {
+    let  type = req.query.type;
+    let  identifier = req.query.identifier;
+    let  validType = type && (type === 'day_type' || type === 'period');
+    let  validIdentifier = identifier && (identifier >= "A" && identifier <= "G" || periodTitleList.includes(identifier));
+    let school = req.params.school ? req.params.school : "US";
+    school = school.toUpperCase();
     if(!validType || !validIdentifier) {
         return res.status(400).send({
             success: false,
             error: "A type or identifier is missing or invalid"
         });
     }
-    var maxResults = !Number.isNaN(parseInt(req.query.maxResults)) ? parseInt(req.query.maxResults) : 1;
-    var date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
-        moment() :
-        moment(req.query.date);
+    let  maxResults = !Number.isNaN(parseInt(req.query.maxResults)) ? parseInt(req.query.maxResults) : 1;
+    let  date = (req.query.date === 'now' || typeof req.query.date === 'undefined') ?
+        moment().tz('America/Denver') :
+        moment(req.query.date).tz('America/Denver');
 
     if(type === 'period') {
         Period.find(
             {
                 title: identifier,
-                start_time: {$gte: date}
+                start_time: {$gte: date},
+                school: school
             }
         ).select('-linked_day -_id -__v').limit(maxResults).exec(function(error, periods) {
             if (error) res.status(500).send({
@@ -316,6 +330,7 @@ router.get('/next_occurrence', function(req, res) {
  * @apiName "Register Account"
  * @apiDescription This endpoint creates a user account in the database and returns a token.
  * @apiGroup Schedule
+ * @apiVersion 1.0.0
  * @apiParam {String} username Account Username
  * @apiParam {String} password Account Password
  * @apiSuccess {String} message Creation status
@@ -332,7 +347,7 @@ router.post('/register', function(req, res) {
             return res.json({message:'Error creating account', account: account});
         }
 
-        var token = jwt.sign({account: account}, secret, {
+        let  token = jwt.sign({account: account}, secret, {
             expiresIn: "365 days"
         });
 
@@ -344,6 +359,7 @@ router.post('/register', function(req, res) {
  * @apiName "Get Token"
  * @apiDescription This endpoint returns a user's token after authentication.
  * @apiGroup Schedule
+ * @apiVersion 1.0.0
  * @apiParam {String} username Account Username
  * @apiParam {String} password Account Password
  * @apiSuccess {String} message Token retrieval statusp
@@ -361,7 +377,7 @@ router.post('/get_token', function(req, res) {
             res.json(400, {error: 'User not found'});
         }
 
-        var token = jwt.sign({account: account}, secret, {
+        let  token = jwt.sign({account: account}, secret, {
             expiresIn: "365 days"
         });
 
@@ -378,7 +394,7 @@ router.post('/get_token', function(req, res) {
 //Auth
 
 router.use(function(req, res, next) {
-    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    let  token = req.body.token || req.query.token || req.headers['x-access-token'];
     if(token) {
         jwt.verify(token, secret, function(err, decoded) {
             if(err) {
@@ -401,15 +417,16 @@ router.use(function(req, res, next) {
  * ******************************/
 
 router.post('/period', function(req,res){
-    var userType = req.decoded.account.userType;
-    if(userType == "Admin") {
+    let  userType = req.decoded.account.userType;
+    if(userType === "Admin") {
         DayType.findOne({date:req.body.day.toString()}, function(error, result){
-            var poster = {
+            let  poster = {
                 day: new Date(req.body.day),
                 start_time: new Date(req.body.start_time),
                 end_time: new Date(req.body.end_time),
                 title: req.body.title,
-                linked_day: result._id
+                linked_day: result._id,
+                school: req.body.school
             };
             Period.create(poster, function(err, post){
                 if(err) res.json("error");
@@ -422,9 +439,9 @@ router.post('/period', function(req,res){
 });
 
 router.post('/day_type', function(req,res){
-    var userType = req.decoded.account.userType;
-    if(userType == "Admin") {
-        var date = moment(req.body.date).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
+    let  userType = req.decoded.account.userType;
+    if(userType === "Admin") {
+        let  date = moment(req.body.date).tz('America/Denver').hours(6).minutes(0).seconds(0).milliseconds(0).utc();
         DayType.create({
                 'date': date,
                 'type': req.body.type

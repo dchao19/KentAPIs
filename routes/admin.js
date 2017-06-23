@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const moment = require('moment');
 const timezone = require('moment-timezone');
 const async = require('async');
@@ -12,7 +11,6 @@ const Models = require('../models/ScheduleModels.js');
 const Account = require('../models/Account.js');
 
 const Period = Models.Period;
-const Day = Models.Day;
 const DayType = Models.DayType;
 
 const config = require('../config.js');
@@ -109,7 +107,7 @@ module.exports = function(connection) {
                 })
             } else {
                 // TODO return render days
-                ctx = genericContext();
+                let ctx = genericContext();
                 ctx.days = days;
                 return res.render('days', ctx);
                 // days: [{date, type}]
@@ -139,7 +137,6 @@ module.exports = function(connection) {
             if (err) return res.json(500, {yes: "Lol. Good Smert."});
             // TODO return render periods
             return res.render('periods', {periods: periods, day: date});
-            // periods: [period]
         });
     });
 
@@ -168,42 +165,43 @@ module.exports = function(connection) {
                 });
 
                 return res.render('period', {period: period});
-                // period: {day, start_time, end_time, title};
             });
 
     });
 
-    router.post('/update_period', ensureLoggedIn('/admin/login'), function (req, res) {
+    router.post('/period', ensureLoggedIn('/admin/login'), function (req, res) {
         // Change period number, start/end time
         // Or, if no date if found, creates a new one
         let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
-        if (!date) return res.json(400, {success: false, error: "No date provided"});
+        if (!date) return res.render('period', {error: "No date provided"});
         let m_date = moment(date);
-        if (!m_date.isValid()) return res.json(400, {success: false, error: "Invalid date provided"});
+        if (!m_date.isValid()) return res.render('period', {error: "Invalid date provided"});
 
         let start_time = req.body.start_time;
         let end_time = req.body.end_time;
         let period_name = req.body.period_name;
         if (typeof start_time === 'undefined' || typeof end_time === 'undefined' || typeof period_name === 'undefined') {
-            return res.json(400, {success: false, error: "Missing period information"});
+            return res.render('period', {error: "Missing period information"});
         }
-        let m_start_time = moment(start_time);
-        let m_end_time = moment(end_time);
+        let m_start_time = moment(start_time).seconds(0).milliseconds(0).utc();
+        let m_end_time = moment(end_time).seconds(0).milliseconds(0).utc();
+        console.log(m_start_time.toISOString());
         if (!(m_start_time.isValid() || m_end_time.isValid())) {
-            return res.json(400, {success: false, error: "Invalid times provided."});
+            return res.render('period', {error: "Invalid times provided."});
         }
 
         Period.findOneAndUpdate(
             {day: m_date},
-            {$set: {start_time: start_time}, $set: {end_time: end_time}, $set: {title: period_name}},
-            {upsert: true},
+            {start_time: m_start_time, end_time: m_end_time, title: period_name},
+            {upsert: true, new:true, fields: "-linked_day -_id -__v"},
             function (err, period) {
-                if (err) return res.json(500, {success: false, error: "I am not good with computer"});
-                else return res.json(200, {success: true, msg: "Updated period!"});
+                console.log(period);
+                if (err) return res.render('period', {error: "Server Error"});
+                else return res.render('period', {msg: "Updated period!", period:period});
             });
     });
 
-    router.post('/delete_period', ensureLoggedIn('/admin/login'), function (req, res) {
+    router.delete('/period', ensureLoggedIn('/admin/login'), function (req, res) {
         // Delete a period
         let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
         if (!date) return res.json(400, {success: false, error: "No date provided"});
@@ -216,7 +214,7 @@ module.exports = function(connection) {
     });
 
 
-    router.post('/delete_day', ensureLoggedIn('/admin/login'), function (req, res) {
+    router.delete('/day', ensureLoggedIn('/admin/login'), function (req, res) {
         // delete a day
 
         // should delete associated periods? TODO
@@ -238,7 +236,7 @@ module.exports = function(connection) {
         })
     });
 
-    router.post('/update_day', ensureLoggedIn('/admin/login'), function (req, res) {
+    router.delete('/day', ensureLoggedIn('/admin/login'), function (req, res) {
         // update a day's day type
         // or, if the day is not found, make it
         let date = (typeof req.body.date === 'undefined') ? false : req.body.date;
@@ -252,8 +250,8 @@ module.exports = function(connection) {
 
         DayType.findOneAndUpdate(
             {date: m_date},
-            {$set: {date: m_date}, $set: {type: type}},
-            {upsert: true},
+            {date: m_date, type: type},
+            {upsert: true, new:true, fields: "-_id -__v"},
             function (err, period) {
                 if (err) return res.json(500, {success: false, error: "I am not good with computer 2"});
                 else return res.json(200, {success: true, msg: "Updated period!"});

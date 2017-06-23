@@ -1,4 +1,4 @@
-var config = {};
+const config = {};
 
 config.serverAddress = "http://localhost:8080";
 

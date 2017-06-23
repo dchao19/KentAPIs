@@ -1,10 +1,10 @@
-var app = require('../app.js');
-var port = process.env.PORT || 8080; // set our port
-var uploadDaytypes = require('./upload_daytypes.js');
-var uploadPeriods = require('./upload_periods.js');
-var createTravisDBAccount = require('./create_travis_account.js');
+const app = require('../app.js');
+const port = process.env.PORT || 8080; // set our port
+const uploadDaytypes = require('./upload_daytypes.js');
+const uploadPeriods = require('./upload_periods.js');
+const createTravisDBAccount = require('./create_travis_account.js');
 
-var server = app.listen(port, (err) => {
+const server = app.listen(port, (err) => {
     if (err) throw new Error(err);
     console.log("App listening");
 });

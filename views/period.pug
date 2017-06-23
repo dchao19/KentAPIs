@@ -1,43 +1,41 @@
 extends base.pug
 
 block content
-  .mdl-cell.mdl-cell--12-col.mdl-cell--8-col-tablet.mdl-grid
-    .mdl-card.mdl-shadow--2dp.mdl-cell.mdl-cell--4-col.mdl-cell--4-col-tablet.mdl-cell--12-col-desktop
-      .mdl-card__title.mdl-card--expand.mdl-color--teal-300
+  div.mdl-cell.mdl-cell--12-col.mdl-cell--8-col-tablet.mdl-grid
+    div.mdl-card.mdl-shadow--2dp.mdl-cell.mdl-cell--4-col.mdl-cell--4-col-tablet.mdl-cell--12-col-desktop
+      div.mdl-card__title.mdl-card--expand.mdl-color--teal-300
         h2.mdl-card__title-text Period
-      .mdl-card__supporting-text.mdl-color-text--grey-600
-        ul.demo-list-three.mdl-list
-          li.mdl-list__item.mdl-list__item--three-line
-            span.mdl-list__item-primary-content
-              i.material-icons.mdl-list__item-avatar schedule
-              span= period.title
-              //- span= period.title
-              span.mdl-list__item-text-body= prettyPeriod(period)
-        span.mdl-list__item-secondary-content
-          form(action="/admin/update_period", method="POST")
-            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              label.mdl-textfield__label(for="date") Date
-              input.mdl-textfield__input(type="date", id="date", name="date")
-            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              label.mdl-textfield__label(for="start_time") Start time
-              input.mdl-textfield__input(type="datetime", id="start_time", name="start_time")
-            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              input.mdl-textfield__input(type="datetime", id="end_time", name="end_time")
-              label.mdl-textfield__label(for="end_time") End time
-            .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
-              input.mdl-textfield__input(type="text", id="period_name", name="period_name", value=period.title)
-              label.mdl-textfield__label(for="sample3") Title
-            //- label(for="period_name")
-            //- input(type="text", name="period_name", value=period.title)
-            input.mdl_button(type="submit")
-          script.
-            document.getElementById('start_time').value = "#{dateTimeStr(period.start_time)}";
-            document.getElementById('end_time').value = "#{dateTimeStr(period.end_time)}";
-            document.getElementById('date').value = "#{dateStr(period.day)}";
-          //- a.mdl-list__item-secondary-action(href='/admin/period?date=' + isoDate(period.day))
-          //-   button.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--accent
-          //-     i.material-icons edit
-    .mdl-cell--1-col
+      if period
+        div.mdl-card__supporting-text.mdl-color-text--grey-600.center
+          span.mdl-list__item-secondary-content
+            ul.demo-list-three.mdl-list
+              li.mdl-list__item.mdl-list__item--three-line
+                span.mdl-list__item-primary-content
+                  i.material-icons.mdl-list__item-avatar schedule
+                  span= period.title
+                  //- span= period.title
+                  span.mdl-list__item-text-body= prettyPeriod(period)
+            form(action="/admin/period", method="POST")
+              .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+                label.mdl-textfield__label(for="date") Date
+                input.mdl-textfield__input(type="date", id="date", name="date" value=moment(period.day).format("YYYY-MM-DD"))
+              br
+              .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+                label.mdl-textfield__label(for="start_time") Start time
+                input.mdl-textfield__input(type="datetime-local", id="start_time", name="start_time" value=moment(period.start_time).format("YYYY-MM-DDTHH:mm"))
+              br
+              .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+                input.mdl-textfield__input(type="datetime-local", id="end_time", name="end_time" value=moment(period.end_time).format("YYYY-MM-DDTHH:mm"))
+                label.mdl-textfield__label(for="end_time") End time
+              br
+              .mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+                input.mdl-textfield__input(type="text", id="period_name", name="period_name", value=period.title)
+                label.mdl-textfield__label(for="period_name") Title
+              //- label(for="period_name")
+              //- input(type="text", name="period_name", value=period.title)
+              br
+              div.mdl-card__actions.right
+                input.mdl-button.mdl-button--colored.mdl-js-button.mdl-js-ripple-effect(type="submit")
 
 block header
   span.mdl-layout-title= prettyDate(period.day)

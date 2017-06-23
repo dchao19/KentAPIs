@@ -41,7 +41,7 @@ function getNewMenus() {
                                     date: curDate,
                                     menu: data[i][1],
                                     sourceDate: lastModified
-                                }, function (err, newLunch) {
+                                }, function (err) {
                                     if (err) throw err;
                                 })
                             }
@@ -61,6 +61,7 @@ setInterval(getNewMenus, 20*60*1000);
 * @api {get} lunch/ Lunch API Status
 * @apiName Lunch API Status
 * @apiGroup Lunch
+* @apiVersion 1.0.0
 * @apiSuccess {String} message The Lunch API is in BETA. The functionality and structure of endpoints may change.
 * @apiSuccessExample Success-Response:
 *   {
@@ -75,13 +76,15 @@ router.get('/', function(req, res){
  * @api {get} lunch/menu Get Lunch Menu
  * @apiName Get Lunch Menu
  * @apiGroup Lunch
+ * @apiVersion 1.0.0
  * @apiDescription This endpoint returns the lunch menu for a given day (only works up to the end of the current week). It defaults to the current day.
  * @apiParam {String} date=now an ISO 8061 date string
  * @apiSuccess {String} date Date in ISO8061 Format, UTC time
  * @apiSuccess {String} menu A menu for the given day.
  * @apiSuccessExample Success-Response:
  *   {
- *
+ *       "date": "2017-05-22T12:00:00.000Z",
+ *       "menu": "Turkey Taco Frito Pie, BBQ Turkey Flatbread, Penne with Mushrooms and Squash"
  *   }
  */
 
