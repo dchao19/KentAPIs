@@ -38,8 +38,8 @@ describe('Api status', function () {
 describe('Periods agree with letter days', function () {
     let count = 0;
     it('checks all dates', function (done) {
+        this.timeout(5000);
         dates.forEach(function (date) {
-            console.log(date);
             getDay(date, function (currentDay) {
                 count++;
                 if (currentDay !== "No school") {
