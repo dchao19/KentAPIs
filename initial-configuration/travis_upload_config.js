@@ -1,6 +1,6 @@
 const config = {};
 
-config.serverAddress = "http://localhost:8080";
+config.serverAddress = `http://localhost:${require('../config').port}`;
 
 config.credentials = {
     "username": "travis",

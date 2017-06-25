@@ -1,5 +1,5 @@
 const app = require('../app.js');
-const port = process.env.PORT || 8080; // set our port
+const port = require('../config').port; // set our port
 const uploadDaytypes = require('./upload_daytypes.js');
 const uploadPeriods = require('./upload_periods.js');
 const createTravisDBAccount = require('./create_travis_account.js');
