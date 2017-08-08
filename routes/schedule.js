@@ -301,7 +301,7 @@ router.get('/:school/next_occurrence', function(req, res) {
                 start_time: {$gte: date},
                 school: school
             }
-        ).select('-linked_day -_id -__v').limit(maxResults).exec(function(error, periods) {
+        ).select('-linked_day -_id -__v').sort({start_time: 1}).limit(maxResults).exec(function(error, periods) {
             if (error) res.status(500).send({
                 success: false,
                 error: "Internal server error"
@@ -315,7 +315,7 @@ router.get('/:school/next_occurrence', function(req, res) {
                 type: identifier,
                 date: {$gte: date}
             }
-        ).select('-linked_day -_id -__v').limit(maxResults).exec(function(error, days) {
+        ).select('-linked_day -_id -__v').sort({date: 1}).limit(maxResults).exec(function(error, days) {
             if (error) res.status(500).send({
                 success: false,
                 error: "Internal server error"
@@ -455,7 +455,7 @@ router.post('/day_type', function(req,res){
     }
 });
 
-router.get('/auth-test', function(req, res) {
+router.get('/auth_test', function(req, res) {
     res.json('Authentication successful!');
 });
 
