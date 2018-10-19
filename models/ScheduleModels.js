@@ -5,7 +5,7 @@ const periodSchema = new mongoose.Schema({
     start_time: Date,
     end_time: Date,
     title: String,
-    linked_day: String,
+    linked_day: [{ type: mongoose.Schema.Types.ObjectId, ref: 'DayType' }],
     school: String
 });
 
