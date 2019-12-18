@@ -1,0 +1,6 @@
+apps:
+  - script   : index.js
+    name     : 'KentAPIs'
+    instances: 1
+    exec_mode: cluster
+    watch  : true

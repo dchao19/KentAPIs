@@ -1,5 +1,5 @@
 const unirest = require('unirest');
-const config = process.env.NODE_ENV === 'testing' ? require('./travis_upload_config.js') : require('./config.js');
+const config = require('./config.js');
 const serverAddress = config.serverAddress;
 const Account = require('../models/Account');
 

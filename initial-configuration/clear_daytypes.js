@@ -19,16 +19,15 @@ mongoose.connect(config.database, function(err) {
 });
 
 
-let startDate = moment(new Date("2016-08-23 12:00:00.000Z"));
+let startDate = moment(new Date("2019-08-20 12:00:00.000Z"));
 
-let endDate = moment(new Date("2017-05-25 12:00:00.000Z"));
+let endDate = moment(new Date("2020-05-25 12:00:00.000Z"));
 
 let curDate = moment(startDate);
 
 while(moment(curDate).isSameOrBefore(endDate)) {
         curDate.add(1, 'd');
         DayType.remove({date:curDate.toISOString()}, function(err, day) {
-                console.log(day);
         });
 }
 

@@ -2,12 +2,14 @@ const ical = require('ical');
 const unirest = require('unirest');
 const moment = require('moment');
 const timezone = require('moment-timezone');
-const config = process.env.NODE_ENV === 'testing' ? require('./travis_upload_config.js') : require('./config.js');
+const config =  require('./config.js');
 const async = require('async');
 
 const serverAddress = config.serverAddress;
 
 const day_types = ical.parseFile('./resources/AllDayTypes.ics');
+
+console.log(config);
 
 const uploadDayTypes = function(callback){
         let req = unirest.post(serverAddress + "/schedule/get_token");
@@ -15,7 +17,6 @@ const uploadDayTypes = function(callback){
         req.headers({
                 "content-type": "application/x-www-form-urlencoded",
         });
-
         req.form(config.credentials);
 
         req.end(function (res) {

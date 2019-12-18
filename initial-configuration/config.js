@@ -3,8 +3,8 @@ const config = {};
 config.serverAddress = `http://localhost:${require('../config').port}`;
 
 config.credentials = {
-    "username": "",
-    "password": ""
+    "username": "alex",
+    "password": "awesome2"
 };
 
 module.exports = config;

@@ -1,7 +1,7 @@
 const ical = require('ical');
 const unirest = require('unirest');
 const moment = require('moment');
-const config = process.env.NODE_ENV === 'testing' ? require('./travis_upload_config.js') : require('./config.js');
+const config =  require('./config.js');
 const timezone = require('moment-timezone');
 const async = require('async');
 

@@ -252,13 +252,21 @@ router.get('/:school/period', function(req, res) {
  *           "start_time" : "",
  *           "end_time": "",
  *           "title": "Period 1",
+ *           "school": "US",
+ *           "linked_day": [
+ *              "type": "A"
+ *           ]
  *       },
  *       {
  *           "day": ""
  *           "start_time" : "",
  *           "end_time": "",
  *           "title": "Period 1",
- *       }
+ *           "school": "US",
+ *           "linked_day": [
+ *              "type": "B"
+ *           ]
+}
  *       ...
  *   ]
  *
@@ -420,6 +428,7 @@ router.post('/period', function(req,res){
     let  userType = req.decoded.account.userType;
     if(userType === "Admin") {
         DayType.findOne({date:req.body.day.toString()}, function(error, result){
+            if(!result) { console.log(req.body.day.toString())}
             let  poster = {
                 day: new Date(req.body.day),
                 start_time: new Date(req.body.start_time),
