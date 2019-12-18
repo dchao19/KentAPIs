@@ -257,7 +257,7 @@ router.get('/:school/period', function(req, res) {
  *           "day": ""
  *           "start_time" : "",
  *           "end_time": "",
- *           "title": "Period 3",
+ *           "title": "Period 1",
  *       }
  *       ...
  *   ]
@@ -271,7 +271,7 @@ router.get('/:school/period', function(req, res) {
  *       },
  *       {
  *           "date": "2016-02-27T13:00:00.000Z",
- *           "type": "B"
+ *           "type": "A"
  *       }
  *       ...
  *   ]
@@ -301,7 +301,7 @@ router.get('/:school/next_occurrence', function(req, res) {
                 start_time: {$gte: date},
                 school: school
             }
-        ).select('-linked_day -_id -__v').sort({start_time: 1}).limit(maxResults).exec(function(error, periods) {
+        ).populate({path: 'linked_day', select:'type -_id'}).select('-_id -__v').sort({start_time: 1}).limit(maxResults).exec(function(error, periods) {
             if (error) res.status(500).send({
                 success: false,
                 error: "Internal server error"
